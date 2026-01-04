@@ -1,0 +1,56 @@
+#directory for  phpstorm/VsCode
+.idea/
+.vscode/
+
+#ignore database connexion file
+
+connexion/Database.php
+
+#sql files
+*.sql
+*.dump
+
+#env files
+.env
+.env.local
+.env.*.local
+
+#In case of use of composer module
+/vendor/
+composer.phar
+
+#In case of javascript dependencies by yarn 
+
+/node_modules/
+npm-debug.log*
+yarn-error.log
+yarn.lock
+
+# File system
+.DS_Store
+._*
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+*~
+.*.swp
+
+# log files
+logs/
+*.log
+tmp/
+temp/
+cache/
+
+# Builds directory
+/dist/
+/build/
+
+# temporary and upload files
+uploads/
+*.tmp
+*.zip
+*.tar.gz
+*.rar
