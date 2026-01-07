@@ -284,8 +284,26 @@ include "header.php";
                                     <?= isset($order['delivery_country']) ? htmlspecialchars($order['delivery_country']) : '' ?><br>
                                     <small style="color:#64748b"><?= msg('label_phone') ?> <?= htmlspecialchars($phoneDecrypted) ?></small>
                                 </p>
-                            </div>  
+                            </div>
 
+                            <div class="detail-group">
+                                <h4>Documents</h4>
+                                <div class="downloads-section">
+                                    <?php if($order['statut'] === 'payée' || $order['statut'] === 'livrée'): ?>
+                                        <a href="generate_facture.php?order_id=<?= $order['id'] ?>" target="_blank" class="btn-download">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                                <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
+                                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                            </svg>
+                                            Télécharger la Facture
+                                        </a>
+                                    <?php else: ?>
+                                        <button class="btn-download disabled" disabled>
+                                            Facture non disponible
+                                        </button>
+                                    <?php endif; ?>
+                                </div> 
+                            </div>
                             <a href="#" class="support-link" onclick="alert('Test d\'envoi de mail, mock (n\'enverras rien'); return false;"><?= msg('link_support') ?></a>
                         </div>
                     </div>

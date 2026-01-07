@@ -45,7 +45,11 @@ class UserManager {
             ]);
 
             if ($success) {
-                return $this->pdo->lastInsertId();
+                $newId = $this->pdo->lastInsertId();
+
+                // Ensure billing customer exists
+                $this->ensureClientExists($newId, $username, $email);
+                return $newId;
             }
             return false;
 
@@ -66,6 +70,27 @@ class UserManager {
             if ($user['is_verified'] == 0) {
                  return false; 
             }
+
+            //If the user exists but does not have a customer file (old account), it is created now.
+            // We prepare the default variables (in case they are null)
+            $decryptedLastname = null;
+            $decryptedFirstname = null;
+
+            // If the name is filled in (and therefore encrypted), it is decrypted
+            if (!empty($user['lastname'])) {
+                $decryptedLastname = Security::decrypt($user['lastname']); 
+            }
+            if (!empty($user['firstname'])) {
+                $decryptedFirstname = Security::decrypt($user['firstname']);
+            }
+
+            $this->ensureClientExists(
+                $user['id'], 
+                $user['username'], 
+                $user['email'], 
+                $decryptedLastname,  
+                $decryptedFirstname 
+            );
             return $user;
         }
         return false;
@@ -102,7 +127,7 @@ class UserManager {
         $mail = new PHPMailer(true);
         try {
             $mail->isSMTP();
-            $mail->Host       = '';
+            $mail->Host       = 'smtp.gmail.com';
             $mail->SMTPAuth   = true;
             $mail->Username   = '';
             $mail->Password   = ''; 
@@ -154,7 +179,7 @@ class UserManager {
         $update->execute([$token_hash, $expiry, $email]);
 
         // Link preparation to send in the email, the user will have to clik to this link to be send in reset_password page
-        $link = "?token=" . $token;
+        $link = "http://localhost/Img2brick_grp/reset_password.php?token=" . $token;
 
         $subject = "Réinitialisation de votre mot de passe";
         $body = "Cliquez sur ce lien pour réinitialiser votre mot de passe (valide 1 min) : <br><br> <a href='$link'>$link</a>";
@@ -182,6 +207,36 @@ class UserManager {
         
         $update = $this->pdo->prepare("UPDATE users SET password = ?, reset_token_hash = NULL, reset_expires_at = NULL WHERE id = ?");
         return $update->execute([$new_hash, $user['id']]);
+    }
+
+    // PRIVATE METHOD FOR LINKING BILLING
+    private function ensureClientExists($userId, $username, $email, $lastname = null, $firstname = null) {
+        try {
+            // Determine the name to display on the invoice
+            if (!empty($lastname) && !empty($firstname)) {
+
+                $nomAffiche = mb_strtoupper($lastname, 'UTF-8') . " " . ucfirst(mb_strtolower($firstname, 'UTF-8'));
+            } else {
+
+                $nomAffiche = "Client Web " . $username;
+            }
+            // Customer Code Generation
+            $codeClient = "WEB" . str_pad($userId, 6, '0', STR_PAD_LEFT);
+
+            // Insert or update if it already exists (ON DUPLICATE KEY UPDATE)
+            $sql = "INSERT INTO client (code_client, user_id, nom, email_fact) 
+                    VALUES (:code, :uid, :nom, :email)
+                    ON DUPLICATE KEY UPDATE user_id = :uid, nom = :nom";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindParam(':code', $codeClient);
+            $stmt->bindParam(':uid', $userId);
+            $stmt->bindParam(':nom', $nomAffiche);
+            $stmt->bindParam(':email', $email);
+            $stmt->execute();
+        } catch (PDOException $e) {
+            // Log error or handle as needed
+            error_log("Error creating billing customer for user $userId : " . $e->getMessage());
+        }
     }
 }
 ?>
