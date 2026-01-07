@@ -78,6 +78,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
     <meta charset="utf-8" />
     <title>img2brick - Upload</title>
     <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
         .uploader { 
             max-width: 520px; 
             margin: 40px auto; 
@@ -85,26 +88,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
     
         .drop-btn {
             display: flex; 
-            flex-direction: column; /* On empile verticalement */
-            align-items: center;    /* On centre horizontalement */
-            justify-content: center; /* On centre verticalement */
-            text-align: center;      /* On centre le texte */
+            flex-direction: column; 
+            align-items: center;    
+            justify-content: center; 
+            text-align: center;      
             gap: 15px; 
-            padding: 40px 20px;      /* Un peu plus d'espace */
+            padding: 40px 20px;      
             border-radius: 12px; 
             border: 2px dashed #cbd5e1; 
             background: white;
             cursor: pointer; 
             transition: all 0.2s; 
             user-select: none;
-            min-height: 200px;       /* Hauteur minimale pour que ce soit joli */
+            min-height: 200px;       
         }
         .drop-btn:hover, .drop-btn.dragover {
             border-color: var(--accent);
             background-color: #eff6ff;
         }
         
-        /* Nouveau style pour l'icône */
         .upload-icon {
             width: 48px;
             height: 48px;
@@ -213,9 +215,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
     const MAX_SIZE = 2 * 1024 * 1024; // 2MB
     const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
 
-    // --- CORRECTION DES MESSAGES ---
-    // On définit les messages ici de manière sécurisée pour éviter de casser le JS
-    <?php $lang = $_SESSION['lang'] ?? 'en'; // Valeur par défaut si non définie ?>
+    // fix to message 
+    // We define the messages here in a secure way to avoid breaking the JS
+    <?php $lang = $_SESSION['lang'] ?? 'en'; // Default value if not defined ?>
     
     const messages = {
         format: "<?= ($lang == 'fr') ? 'Format non supporté (JPG, PNG, WEBP uniquement).' : 'Unsupported format (JPG, PNG, WEBP only).' ?>",

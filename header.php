@@ -246,6 +246,8 @@ if (session_status() === PHP_SESSION_NONE) {
                 <a href="deconnexion.php" style="color:#ef4444;"><?= msg('nav_logout') ?></a>
             <?php else: ?>
                 <a href="upload.php"><?= msg('nav_home') ?></a>
+                <span class="separator">|</span>
+                <a href="inscription.php"><?= msg('nav_login_signup') ?></a>
             <?php endif; ?>
         </div>
 

@@ -142,208 +142,208 @@ if (isset($_POST['login'])) {
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <style>
         * { box-sizing: border-box; }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            display: flex;
-            background: #f0f2f5;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-        }
-        .wrapper {
-            background: #fff;
-            height: 520px; /* Increased height to accommodate new field */
-            width: 450px;
-            max-width: 100%;
-            border-radius: 20px;
-            box-shadow: 0 15px 20px rgba(0,0,0,0.1);
-            overflow: hidden; 
-            position: relative;
-        }
-        .slide-container {
-            width: 200%; 
-            display: flex;
-            transition: transform 0.6s ease-in-out;
-        }
-        .form-box {
-            width: 50%;
-            padding: 0 10px;
-            box-sizing: border-box;
-        }
-        .title-text {
-            font-size: 25px;
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 20px;
-            color: #333;
-        }
-        .field {
-            height: 50px;
-            width: 100%;
-            margin-top: 20px;
-            position: relative;
-        }
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+        display: flex; 
+        flex-direction: column; 
+        margin: 0;
+        padding-top: 80px; 
+    }
 
-        .field input {
-            height: 100%;
-            width: 100%;
-            outline: none;
-            padding-left: 15px;
-            border-radius: 5px;
-            border: 1px solid lightgrey;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-        }
+    .login-container {
+        flex: 1; 
+        display: flex;
+        align-items: center; 
+        justify-content: center; 
+        width: 100%;
+        padding: 20px; 
+    }
 
-        .field input:focus {
-            border-color: #4A90E2;
-            box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
-        }
+    .wrapper {
+        background: #fff;
+        height: 500px; 
+        width: 450px;
+        max-width: 100%;
+        border-radius: 20px;
+        box-shadow: 0 15px 20px rgba(0,0,0,0.1);
+        overflow: hidden; 
+        position: relative;
+    }
 
-        button[type="submit"] {
-            margin-top: 20px;
-            width: 100%;
-            height: 50px;
-            border: none;
-            border-radius: 5px;
-            color: #fff;
-            font-size: 18px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
 
-        button[type="submit"]:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-
-        button[type="submit"]:hover:not(:disabled) {
-            opacity: 0.9;
-        }
-        .link {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-        }
-        
-        .link a {
-            color: #4A90E2;
-            text-decoration: none;
-        }
-
-        .link a:hover {
-            text-decoration: underline;
-        }
-
-        .pass-link {
-            text-align: left; 
-            margin-top: 10px; 
-            font-size: 14px;
-        }
-        .pass-link a { 
-            color: #888; 
-            text-decoration: none; 
-        }
-        .pass-link a:hover { 
-            color: #4A90E2; 
-        }
-        .error { 
-            background: #ffebee; 
-            color: #c62828; 
-            padding: 10px; 
-            border-radius: 5px; 
-            font-size: 14px; 
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        .success { 
-            background: #e8f5e9; 
-            color: #2e7d32; 
-            padding: 10px; 
-            border-radius: 5px; 
-            font-size: 14px; 
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        .cf-turnstile {
-            margin-top: 15px;
-            display: flex;
-            justify-content: center;
-        }
-
-        footer{
-            position: fixed;
-            bottom: 20px;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            z-index: 1;
-        }
+    .slide-container {
+        width: 200%; 
+        display: flex;
+        transition: transform 0.6s ease-in-out;
+    }
+    .form-box {
+        width: 50%;
+        padding: 0 10px;
+        box-sizing: border-box;
+    }
+    .title-text {
+        font-size: 25px;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+        margin-top: 20px;
+    }
+    .field {
+        height: 50px;
+        width: 100%;
+        margin-top: 20px;
+        position: relative;
+    }
+    .field input {
+        height: 100%;
+        width: 100%;
+        outline: none;
+        padding-left: 15px;
+        border-radius: 5px;
+        border: 1px solid lightgrey;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+    .field input:focus {
+        border-color: #4A90E2;
+        box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
+    }
+    button[type="submit"] {
+        margin-top: 20px;
+        width: 100%;
+        height: 50px;
+        border: none;
+        border-radius: 5px;
+        color: #fff;
+        font-size: 18px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #4A90E2; 
+    }
+    button[type="submit"]:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+    }
+    button[type="submit"]:hover:not(:disabled) {
+        opacity: 0.9;
+    }
+    .link {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 14px;
+    }
+    .link a {
+        color: #4A90E2;
+        text-decoration: none;
+    }
+    .link a:hover {
+        text-decoration: underline;
+    }
+    .pass-link {
+        text-align: left; 
+        margin-top: 10px; 
+        font-size: 14px;
+    }
+    .pass-link a { 
+        color: #888; 
+        text-decoration: none; 
+    }
+    .pass-link a:hover { 
+        color: #4A90E2; 
+    }
+    .error { 
+        background: #ffebee; 
+        color: #c62828; 
+        padding: 10px; 
+        border-radius: 5px; 
+        font-size: 14px; 
+        text-align: center;
+        margin: 10px;
+    }
+    .success { 
+        background: #e8f5e9; 
+        color: #2e7d32; 
+        padding: 10px; 
+        border-radius: 5px; 
+        font-size: 14px; 
+        text-align: center;
+        margin: 10px;
+    }
+    .cf-turnstile {
+        margin-top: 15px;
+        display: flex;
+        justify-content: center;
+    }
     </style>
 </head>
 
-<div class="wrapper">
-    
-    <?php if($statusMessage): ?>
-        <div class="error"><?= htmlspecialchars($statusMessage) ?></div>
-    <?php endif; ?>
+<div class="login-container">
 
-    <?php if($successNotification): ?>
-        <div class="success"><?= htmlspecialchars($successNotification) ?></div>
-    <?php endif; ?>
-
-    <div class="slide-container" id="slideContainer">
+    <div class="wrapper">
         
-        <div class="form-box login">
-            <div class="title-text"><?= msg('title_login') ?></div>
-            <form method="post" action="#">
-                <div class="field">
-                    <input type="email" name="email" placeholder="<?= msg('placeholder_email') ?>" required>
-                </div>
-                <div class="field">
-                    <input type="password" name="password" placeholder="<?= msg('placeholder_password') ?>" required>
-                </div>
-                
-                <div class="pass-link">
-                    <a href="forgot_password.php"><?= msg('link_forgot_pass') ?></a>
-                </div>
+        <?php if($statusMessage): ?>
+            <div class="error"><?= htmlspecialchars($statusMessage) ?></div>
+        <?php endif; ?>
 
-                <div class="cf-turnstile" data-sitekey="" data-callback="onCaptchaSuccessLog"></div>
-                
-                <button type="submit" name="login" id="btn-log" disabled><?= msg('btn_login') ?></button>
-                
-                <div class="link">
-                   <?= msg('ask_no_account') ?> <a href="#" onclick="switchToRegister(event)"><?= msg('action_signup') ?></a>
-                </div>
-            </form>
+        <?php if($successNotification): ?>
+            <div class="success"><?= htmlspecialchars($successNotification) ?></div>
+        <?php endif; ?>
+
+        <div class="slide-container" id="slideContainer">
+            
+            <div class="form-box login">
+                <div class="title-text"><?= msg('title_login') ?></div>
+                <form method="post" action="#">
+                    <div class="field">
+                        <input type="email" name="email" placeholder="<?= msg('placeholder_email') ?>" required>
+                    </div>
+                    <div class="field">
+                        <input type="password" name="password" placeholder="<?= msg('placeholder_password') ?>" required>
+                    </div>
+                    
+                    <div class="pass-link">
+                        <a href="forgot_password.php"><?= msg('link_forgot_pass') ?></a>
+                    </div>
+
+                    <div class="cf-turnstile" data-sitekey="" data-callback="onCaptchaSuccessLog"></div>
+                    
+                    <button type="submit" name="login" id="btn-log" disabled><?= msg('btn_login') ?></button>
+                    
+                    <div class="link">
+                       <?= msg('ask_no_account') ?> <a href="#" onclick="switchToRegister(event)"><?= msg('action_signup') ?></a>
+                    </div>
+                </form>
+            </div>
+
+            <div class="form-box register">
+                <div class="title-text"><?= msg('title_register') ?></div>
+                <form method="post" action="#">
+                    <div class="field">
+                        <input type="email" name="email" placeholder="<?= msg('placeholder_email') ?>" required>
+                    </div>
+                    <div class="field">
+                        <input type="password" name="password" placeholder="<?= msg('placeholder_password') ?>" required>
+                    </div>
+                    <div class="field">
+                        <input type="password" name="confirm_password" placeholder="<?= ($_SESSION['lang'] == 'fr') ? 'Confirmer le mot de passe' : 'Confirm Password' ?>" required>
+                    </div>
+
+                    <div class="cf-turnstile" data-sitekey="" data-callback="onCaptchaSuccessReg"></div>
+                    
+                    <button type="submit" name="register" id="btn-reg" disabled><?= msg('btn_register') ?></button>
+                    
+                    <div class="link">
+                        <?= msg('ask_has_account') ?> <a href="#" onclick="switchToLogin(event)"><?= msg('action_login') ?></a>
+                    </div>
+                </form>
+            </div>
+
         </div>
-
-        <div class="form-box register">
-            <div class="title-text"><?= msg('title_register') ?></div>
-            <form method="post" action="#">
-                <div class="field">
-                    <input type="email" name="email" placeholder="<?= msg('placeholder_email') ?>" required>
-                </div>
-                <div class="field">
-                    <input type="password" name="password" placeholder="<?= msg('placeholder_password') ?>" required>
-                </div>
-                <div class="field">
-                    <input type="password" name="confirm_password" placeholder="<?= ($_SESSION['lang'] == 'fr') ? 'Confirmer le mot de passe' : 'Confirm Password' ?>" required>
-                </div>
-
-                <div class="cf-turnstile" data-sitekey="" data-callback="onCaptchaSuccessReg"></div>
-                
-                <button type="submit" name="register" id="btn-reg" disabled><?= msg('btn_register') ?></button>
-                
-                <div class="link">
-                    <?= msg('ask_has_account') ?> <a href="#" onclick="switchToLogin(event)"><?= msg('action_login') ?></a>
-            </form>
-        </div>
-
     </div>
 </div>
 
