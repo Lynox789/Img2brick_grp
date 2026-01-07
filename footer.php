@@ -130,7 +130,7 @@
         <div class="footer-col">
             <h3><?= msg('footer_project_title') ?></h3>
             <ul class="footer-links">
-                <li><a href="#"><?= msg('footer_link_team') ?></a></li>
+                <li><a href="team.php"><?= msg('footer_link_team') ?></a></li>
                 <li><a href="terms.php"><?= msg('footer_link_terms') ?></a></li>
                 <li><a href="legal.php"><?= msg('footer_link_legal') ?></a></li>
             </ul>
