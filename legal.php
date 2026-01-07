@@ -124,7 +124,7 @@ include 'header.php';
         <p>La marque <em>Lego</em> est une marque déposée du groupe LEGO. Ce site est un projet pédagogique indépendant et n'est pas sponsorisé ou autorisé par le groupe LEGO.</p>
 
         <h2>5. Cookies</h2>
-        <p>Ce site utilise des cookies techniques (session PHPSESSID) strictement nécessaires au bon fonctionnement de l'authentification et de la navigation.</p>
+        <p>Ce site utilise des cookies techniques strictement nécessaires au bon fonctionnement de l'authentification et de la navigation.</p>
 
         <div style="text-align: center;">
             <a href="index.php" class="back-btn">Retour à l'accueil</a>
