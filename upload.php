@@ -85,19 +85,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
     
         .drop-btn {
             display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            padding: 20px;
+            flex-direction: column; /* On empile verticalement */
+            align-items: center;    /* On centre horizontalement */
+            justify-content: center; /* On centre verticalement */
+            text-align: center;      /* On centre le texte */
+            gap: 15px; 
+            padding: 40px 20px;      /* Un peu plus d'espace */
             border-radius: 12px; 
             border: 2px dashed #cbd5e1; 
             background: white;
             cursor: pointer; 
             transition: all 0.2s; 
             user-select: none;
+            min-height: 200px;       /* Hauteur minimale pour que ce soit joli */
         }
         .drop-btn:hover, .drop-btn.dragover {
             border-color: var(--accent);
             background-color: #eff6ff;
+        }
+        
+        /* Nouveau style pour l'icône */
+        .upload-icon {
+            width: 48px;
+            height: 48px;
+            color: #94a3b8;
+            transition: color 0.2s;
+        }
+        .drop-btn:hover .upload-icon {
+            color: var(--accent);
         }
         
         .content { 
@@ -161,6 +176,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
 
     <form id="uploadFormElement" method="post" enctype="multipart/form-data">
         <label class="drop-btn" id="dropAreaElement">
+            
+            <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
             <div class="content">
                 <div class="title"><?= msg('upload_drop_title') ?></div>
                 <div class="subtitle"><?= msg('upload_drop_subtitle') ?></div>
@@ -179,7 +198,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
     </form>
 </div>
 
-<?php include "footer.php"; ?>
+    <?php include "footer.php"; ?>
 
 <script>
     const dropAreaElement = document.getElementById('dropAreaElement');

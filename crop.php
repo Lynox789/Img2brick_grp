@@ -53,11 +53,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php include "header.php"; ?>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
 <style>
-    .main-wrapper { 
+.main-wrapper { 
         display: flex; 
-        height: calc(100vh - 80px);
-        overflow: hidden;
+        /* On force la hauteur MINIMALE à la taille de l'écran moins le header */
+        /* Le footer sera donc poussé hors de l'écran (scroll nécessaire) */
+        min-height: calc(100vh - 80px); 
+        width: 100%;
         margin-top: 0;
+        position: relative; 
     }
 
     .image-stage { 
@@ -68,6 +71,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         justify-content: center; 
         overflow: hidden; 
         position: relative; 
+        /* On s'assure que la zone noire fait au moins 500px de haut quoi qu'il arrive */
+        min-height: 500px;
     }
 
     #imageElement { 
