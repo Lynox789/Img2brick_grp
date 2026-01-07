@@ -225,8 +225,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
         success: "<?= ($lang == 'fr') ? 'Image prête ! Cliquez sur Continuer.' : 'Image ready! Click Continue.' ?>"
     };
 
-    // Trigger file input when clicking the drop area
-    dropAreaElement.addEventListener('click', () => fileInputElement.click());
+    // Trigger removed to prevent double click (label handles it natively)
+    // dropAreaElement.addEventListener('click', () => fileInputElement.click());
     
     // Handle file selection from standard input
     fileInputElement.addEventListener('change', (event) => handleFileSelection(event.target.files[0]));
