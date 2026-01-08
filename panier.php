@@ -174,7 +174,7 @@ include "header.php";
                             </div>
 
                             <div class="detail-group" style="margin-bottom:0;">
-                                <a href="#" class="btn-new-order" style="display:block; text-align:center; background:#cbd5e1; cursor:not-allowed;">Télécharger la Facture (Bientôt)</a>
+                                <a href="generate_facture.php?order_id=<?= $order['id'] ?>" class="btn-new-order" style="display:block; text-align:center; background:#cbd5e1;">Télécharger la Facture</a>
                             </div>
                         </div>
                     </div>

@@ -51,6 +51,9 @@ if (!$isLogged) {
 // PROCESSING OF THE FORM
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
+    // We start a transaction so that everything is recorded (Order + Invoice) or nothing at all
+    $db->beginTransaction();
+
     try {
         $userId = 0;
 
@@ -111,46 +114,121 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $fullAddress = $_POST['address'] . ", " . $_POST['zipcode'] . " " . $_POST['city'] . ", " . $_POST['country'];
         $phone = $_POST['phone'];
 
-        // Insertion
-        $fullAddress = $_POST['address'] . ", " . $_POST['zipcode'] . " " . $_POST['city'] . ", " . $_POST['country'];
-        $phone = $_POST['phone'];
-        
-        // SQL QUERY
-        // We insert $imagePath in the final_image_path column
-        $sqlOrder = "INSERT INTO commandes (
-            user_id, 
-            image_id, 
-            final_image_path, 
-            selected_style, 
-            total_price, 
-            statut, 
-            date_commande, 
-            delivery_address, 
-            delivery_phone
-        ) VALUES (?, ?, ?, ?, ?, 'payée', NOW(), ?, ?)";
-
+        $sqlOrder = "INSERT INTO commandes (user_id, image_id, final_image_path, selected_style, total_price, statut, date_commande, delivery_address, delivery_phone) VALUES (?, ?, ?, ?, ?, 'payée', NOW(), ?, ?)";
         $stmtOrder = $db->prepare($sqlOrder);
-        $stmtOrder->execute([
-            $userId, 
-            $imageId, 
-            $imagePath,       
-            $cartStyle, 
-            $cartPrice, 
-            $fullAddress, 
-            $phone
-        ]);
+        $stmtOrder->execute([$userId, $imageId, $imagePath, $cartStyle, $cartPrice, $fullAddress, $phone]);
         
         $orderId = $db->lastInsertId();
-        // CLEANING AND REDIRECTION
+        
+
+        // Management of the Client (Table 'client')
+        $stmtClient = $db->prepare("SELECT code_client FROM client WHERE user_id = ?");
+        $stmtClient->execute([$userId]);
+        $existingClient = $stmtClient->fetch(PDO::FETCH_ASSOC);
+
+        if ($existingClient) {
+            $codeClient = $existingClient['code_client'];
+        } else {
+            $codeClient = "CLT-" . str_pad($userId, 5, '0', STR_PAD_LEFT);
+            $clientName = "Client Web " . $userId;
+            
+            $stmtNewClt = $db->prepare("INSERT INTO client (code_client, user_id, nom, email_fact) VALUES (?, ?, ?, ?)");
+            $userEmailQuery = $db->prepare("SELECT email FROM users WHERE id = ?");
+            $userEmailQuery->execute([$userId]);
+            $uEmail = $userEmailQuery->fetchColumn();
+            
+            $stmtNewClt->execute([$codeClient, $userId, $clientName, $uEmail]);
+        }
+
+        // Commercial
+        $db->query("INSERT IGNORE INTO commercial (code_commercial, nom_commercial) VALUES ('WEB', 'Site Internet')");
+
+        // Creation of the Invoice (CORRECTION: We create it in DRAFT first)
+        $sqlFacture = "INSERT INTO facture (
+            commande_id, code_client, code_commercial, 
+            type_document, etat_facture, validation, 
+            date_document, nom_client, 
+            adresse_fact, cp_fact, ville_fact
+        ) VALUES (
+            ?, ?, 'WEB', 
+            'FACTURE', 'BROUILLON', 0, 
+            CURDATE(), ?, 
+            ?, ?, ?
+        )";
+
+        // Note: We set 'DRAFT' and validation = 0 to be able to add lines right after
+
+        $stmtFact = $db->prepare($sqlFacture);
+        $stmtFact->execute([
+            $orderId, 
+            $codeClient, 
+            "Client Web", 
+            $_POST['address'], 
+            $_POST['zipcode'], 
+            $_POST['city']
+        ]);
+        
+        // Secure invoice ID recovery
+        $stmtGetFactId = $db->prepare("SELECT id_facture FROM facture WHERE commande_id = ?");
+        $stmtGetFactId->execute([$orderId]);
+        $factureRow = $stmtGetFactId->fetch(PDO::FETCH_ASSOC);
+
+        if (!$factureRow) {
+            throw new Exception("Erreur critique : La facture a été créée mais son ID est introuvable.");
+        }
+        $factureId = $factureRow['id_facture'];
+
+
+        // 4. Invoice Line
+        $prixTTC = floatval($cartPrice);
+        $tvaRate = 1.20; 
+        $prixHT = $prixTTC / $tvaRate;
+        
+        // Creation of the article if non-existent
+        $db->query("INSERT IGNORE INTO article (id_article, description, prix_unitaire_ht, taux_tva) VALUES ('KIT_MOSAIQUE', 'Kit Mosaïque Lego Personnalisé', 0, 20.00)");
+
+        $idLigne = uniqid(); // Generates a unique ID (ex: 65a4f8...)
+
+        $sqlLigne = "INSERT INTO ligne_facture (
+            id_ligne_facture,   
+            num_ligne, id_facture, id_article, 
+            designation_article_cache, quantite, 
+            prix_unitaire_ht, pourcentage_remise_ligne
+        ) VALUES (
+            ?,                  
+            1, ?, 'KIT_MOSAIQUE', 
+            ?, 1, 
+            ?, 0
+        )";
+
+        $descArticle = "Kit Mosaïque " . $proposal['resolution'] . "x" . $proposal['resolution'] . " - " . ucfirst($cartStyle);
+        
+        $stmtLigne = $db->prepare($sqlLigne);
+        
+        // We pass $idLigne as the first parameter
+
+        $stmtLigne->execute([$idLigne, $factureId, $descArticle, $prixHT]);
+
+        // Now that the lines are added, we can lock the invoice
+        $stmtValide = $db->prepare("UPDATE facture SET etat_facture = 'VALIDEE', validation = 1 WHERE id_facture = ?");
+        $stmtValide->execute([$factureId]);
+
+
+        // Validation finale
+        $db->commit();
+
+        // Nettoyage session
         unset($_SESSION['final_proposal_id']);
         unset($_SESSION['current_image_id']);
         unset($_SESSION['redirect_after_auth']);
-
-        // Redirect to confirmation
+        
         header("Location: confirmation.php?order_id=" . $orderId);
         exit;
+
     } catch (Exception $e) {
-        $error = $e->getMessage();
+        $db->rollBack(); // Total cancellation in case of error (no defective order without invoice)
+        $error = "Erreur lors du traitement : " . $e->getMessage();
+        error_log($e->getMessage()); // Log pour le débug
     }
 }
 
@@ -385,10 +463,6 @@ include "header.php";
             <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
                 <span><?= msg('lbl_style') ?></span>
                 <strong><?= ucfirst($cartStyle) ?></strong>
-            </div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                <span><?= msg('lbl_size') ?></span>
-                <strong><?= $cartSize ?> tenons</strong>
             </div>
             <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
                 <span>Pièces</span>

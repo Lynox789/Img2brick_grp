@@ -53,7 +53,6 @@ $price = $proposal['estimated_cost'] > 0 ? $proposal['estimated_cost'] : ($propo
             <div class="spinner"></div>
             <h2 style="color: var(--accent); margin-top: 20px;">Calcul des pièces en cours...</h2>
             <p style="color: #64748b;">Nos robots analysent votre image pour optimiser le nombre de briques.</p>
-            <p>Algorithme choisi : <strong><?= str_replace('ALGO_', 'Algorithme ', $proposal['strategy']) ?></strong></p>
             
             <script>
                 setTimeout(function(){
