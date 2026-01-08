@@ -20,18 +20,28 @@ $stmt->execute([$propId]);
 $proposal = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$proposal) {
-    // If the proposal does not exist more
-    header("Location: upload.php");
+    error_log("Erreur Checkout: Proposition #$propId introuvable en BDD.");
+    header("Location: upload.php"); // Return to square one
     exit;
 }
 
+$imageId = $proposal['image_id']; // The source image ID
+$imagePath = "uploads/preview_" . $propId . ".png"; // The path of the generated image
 // Calculation of variables for display (Mapping old cart -> BDD)
 $cartStyle = str_replace('ALGO_', 'Algo ', $proposal['strategy']); // Ex: Algo 5
-$cartSize  = $proposal['resolution']; // Ex: 48x48
 $cartPrice = $proposal['estimated_cost'] > 0 ? $proposal['estimated_cost'] : ($proposal['total_bricks_count'] * 0.10); // Calcul prix
 
 $error = "";
 $isLogged = isset($_SESSION['user_id']);
+
+if (empty($imageId)) {
+    // We note the error for the developer in the server’s error.log file
+    error_log("Erreur Critique Checkout: image_id NULL pour la proposition #$propId");
+    
+    // We politely redirect the user to the upload without displaying technical details
+    header("Location: upload.php");
+    exit;
+}
 
 // If the user is not logged in
 if (!$isLogged) {
