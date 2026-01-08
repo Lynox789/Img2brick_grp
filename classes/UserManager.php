@@ -127,7 +127,7 @@ class UserManager {
         $mail = new PHPMailer(true);
         try {
             $mail->isSMTP();
-            $mail->Host       = 'smtp.gmail.com';
+            $mail->Host       = '';
             $mail->SMTPAuth   = true;
             $mail->Username   = '';
             $mail->Password   = ''; 
