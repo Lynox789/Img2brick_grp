@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $userId = $_SESSION['user_id'];
-
+$lang = $_SESSION['lang'] ?? 'en';
 // Récupération des commandes
 // On joint avec la table 'images' pour récupérer la taille cible (target_size)
 $stmt = $db->prepare("
@@ -26,10 +26,10 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // Fonction utilitaire pour les badges de statut
 function getStatusBadge($status) {
     switch(strtolower($status)) { // strtolower pour être sûr
-        case 'payée': return '<span class="badge badge-success">Payée - En préparation</span>';
-        case 'expédiée': return '<span class="badge badge-info">Expédiée</span>';
-        case 'livrée': return '<span class="badge badge-primary">Livrée</span>';
-        case 'annulée': return '<span class="badge badge-danger">Annulée</span>';
+        case 'payée': return '<span class="badge badge-success">' . msg('status_paid') . '</span>';
+        case 'expédiée': return '<span class="badge badge-info">' . msg('status_shipped') . '</span>';
+        case 'livrée': return '<span class="badge badge-primary">' . msg('status_delivered') . '</span>';
+        case 'annulée': return '<span class="badge badge-danger">' . msg('status_cancelled') . '</span>';
         default: return '<span class="badge badge-warning">' . htmlspecialchars($status) . '</span>';
     }
 }
@@ -96,36 +96,32 @@ include "header.php";
     
     <div class="dashboard-header">
         <div class="header-text">
-            <h1>Mes Commandes</h1>
-            <p>Retrouvez l'historique de vos créations Lego.</p>
+            <h1><?= msg('dashboard_title') ?></h1>
+            <p><?= msg('dashboard_subtitle') ?></p>
         </div>
-        <a href="upload.php" class="btn-new-order">Nouvelle création</a>
+        <a href="upload.php" class="btn-new-order"><?= msg('btn_new_creation') ?></a>
     </div>
 
     <div class="orders-grid">
         
         <?php if (empty($orders)): ?>
             <div style="grid-column: 1/-1; text-align: center; padding: 50px; background: white; border-radius: 12px; color: #64748b;">
-                <p>Vous n'avez pas encore passé de commande.</p>
-                <a href="upload.php" style="color: var(--primary); font-weight:bold;">Commencer ma première mosaïque</a>
+                <p><?= msg('empty_orders_msg') ?></p>
+                <a href="upload.php" style="color: var(--primary); font-weight:bold;"><?= msg('link_start_mosaic') ?></a>
             </div>
         <?php else: ?>
             
             <?php foreach ($orders as $order): ?>
                 <?php 
-                    // 1. Gestion de l'image (Chemin Fichier)
-                    $imgSrc = 'assets/placeholder.png'; // Fallback
+                    $imgSrc = 'assets/placeholder.png'; 
                     if (!empty($order['final_image_path'])) {
-                        // On ajoute un timestamp pour éviter le cache navigateur si l'image change
                         $imgSrc = $order['final_image_path'] . '?t=' . time();
                     }
                     
-                    // 2. Formatage Date
                     $date = new DateTime($order['date_commande']);
                     $orderRef = 'CMD-' . $date->format('Y') . '-' . str_pad($order['id'], 5, '0', STR_PAD_LEFT);
+                    $dateFormat = ($lang == 'en') ? 'Y/m/d H:i' : 'd/m/Y à H:i';
 
-                    // 3. Données Adresse (Texte Clair)
-                    // On utilise htmlspecialchars pour la sécurité XSS
                     $addressDisplay = htmlspecialchars($order['delivery_address']);
                     $phoneDisplay = htmlspecialchars($order['delivery_phone']);
                 ?>
@@ -139,42 +135,44 @@ include "header.php";
                         <img src="<?= $imgSrc ?>" alt="Aperçu Mosaïque" class="order-thumb">
                         <div class="order-info">
                             <h3><?= ucfirst($order['selected_style']) ?></h3>
-                            <p>Taille : <?= $order['target_size'] ?>x<?= $order['target_size'] ?> tenons</p>
+                            <p><?= msg('lbl_size') ?> <?= $order['target_size'] ?>x<?= $order['target_size'] ?> tenons</p>
                             <span class="order-price"><?= number_format($order['total_price'], 2) ?> €</span>
                         </div>
                     </div>
                     <div class="order-footer">
-                        <a href="#" class="btn-details" onclick="openModal('modal-<?= $order['id'] ?>'); return false;">Détails</a>
+                        <a href="#" class="btn-details" onclick="openModal('modal-<?= $order['id'] ?>'); return false;"><?= msg('btn_details') ?></a>
                     </div>
                 </div>
 
                 <div id="modal-<?= $order['id'] ?>" class="modal-overlay">
                     <div class="modal-box">
                         <div class="modal-header">
-                            <h2>Commande <?= $orderRef ?></h2>
+                            <h2><?= msg('modal_title_order') ?> <?= $orderRef ?></h2>
                             <button class="close-modal" onclick="closeModal('modal-<?= $order['id'] ?>')">&times;</button>
                         </div>
                         <div class="modal-content">
                             
                             <div class="detail-group">
-                                <h4>Informations Générales</h4>
-                                <div class="detail-row"><span>Date</span> <strong><?= $date->format('d/m/Y à H:i') ?></strong></div>
-                                <div class="detail-row"><span>Statut</span> <?= getStatusBadge($order['statut']) ?></div>
-                                <div class="detail-row"><span>Montant Total</span> <strong><?= number_format($order['total_price'], 2) ?> €</strong></div>
+                                <h4><?= msg('section_general_info') ?></h4>
+                                <div class="detail-row"><span><?= msg('lbl_date') ?></span> <strong><?= $date->format($dateFormat) ?></strong></div>
+                                <div class="detail-row"><span><?= msg('lbl_status') ?></span> <?= getStatusBadge($order['statut']) ?></div>
+                                <div class="detail-row"><span><?= msg('lbl_total_amount') ?></span> <strong><?= number_format($order['total_price'], 2) ?> €</strong></div>
                             </div>
 
                             <div class="detail-group">
-                                <h4>Livraison</h4>
+                                <h4><?= msg('section_delivery') ?></h4>
                                 <p style="font-size: 0.95rem; line-height: 1.5; color: #334155; background: #f8fafc; padding: 10px; border-radius: 6px;">
                                     <?= nl2br($addressDisplay) ?> <br>
                                     <small style="color:#64748b; display:block; margin-top:5px;">
-                                        Tél: <?= $phoneDisplay ?>
+                                        <?= msg('lbl_tel') ?>: <?= $phoneDisplay ?>
                                     </small>
                                 </p>
                             </div>
 
                             <div class="detail-group" style="margin-bottom:0;">
-                                <a href="generate_facture.php?order_id=<?= $order['id'] ?>" class="btn-new-order" style="display:block; text-align:center; background:#cbd5e1;">Télécharger la Facture</a>
+                                <a href="generate_facture.php?order_id=<?= $order['id'] ?>" class="btn-new-order" style="display:block; text-align:center; background:#cbd5e1;">
+                                    <?= msg('btn_download_invoice') ?>
+                                </a>
                             </div>
                         </div>
                     </div>
