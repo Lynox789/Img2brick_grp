@@ -5,7 +5,7 @@ include 'header.php';
 
 <head>
     <style>
-        /* --- BASE CSS --- */
+        /*BASE CSS*/
         * { box-sizing: border-box; }
 
         body {
@@ -52,7 +52,7 @@ include 'header.php';
             font-size: 16px;
         }
 
-        /* --- GRILLE ÉQUIPE --- */
+        /*TEAM GRID*/
         .team-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -126,7 +126,7 @@ include 'header.php';
             gap: 10px;
         }
 
-        /* --- BOUTONS SOCIAUX MEMBRES (Classe renommée pour éviter conflit footer) --- */
+        /*SOCIAL BUTTONS MEMBERS*/
         .member-social-btn {
             display: inline-flex;
             align-items: center;
@@ -141,11 +141,11 @@ include 'header.php';
         }
 
         .member-social-btn:hover {
-            background-color: #0077b5; /* Bleu LinkedIn officiel */
+            background-color: #0077b5; 
             color: white;
         }
 
-        /* --- FOOTER BUTTONS (Page actions) --- */
+        /*FOOTER BUTTONS*/
         .footer-actions {
             display: flex;
             justify-content: center;
@@ -169,7 +169,7 @@ include 'header.php';
             color: white;
         }
 
-        /* Couleurs spécifiques arrière-plans */
+        /*Specific background colors*/
         .card-1 .card-img-wrapper { background-color: #E2E8F0; }
         .card-2 .card-img-wrapper { background-color: #E9D8FD; }
         .card-3 .card-img-wrapper { background-color: #C6F6D5; }
@@ -182,8 +182,8 @@ include 'header.php';
 <div class="legal-container">
     <div class="legal-wrapper">
         
-        <h1>La Team</h1>
-        <p class="subtitle">L'équipe du projet Img2bricks</p>
+        <h1><?= msg('team_title') ?></h1>
+        <p class="subtitle"><?= msg('team_subtitle') ?></p>
 
         <div class="team-grid">
 
@@ -193,7 +193,7 @@ include 'header.php';
                 </div>
                 <div class="card-body">
                     <h3 class="member-name">Valentin Carchon</h3>
-                    <div class="member-role">Scrum Master / Dev</div>
+                    <div class="member-role"><?= msg('role_scrum') ?></div>
                     <div class="social-links">
                         <a href="https://www.linkedin.com/in/valentin-carchon-811786338/" target="_blank" class="member-social-btn" title="LinkedIn">
                             <svg style="width:18px;height:18px" viewBox="0 0 24 24"><path fill="currentColor" d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z" /></svg>
@@ -208,7 +208,7 @@ include 'header.php';
                 </div>
                 <div class="card-body">
                     <h3 class="member-name">Sébastien Dumur</h3>
-                    <div class="member-role">Tech Lead / Dev</div>
+                    <div class="member-role"><?= msg('role_tech_lead') ?></div>
                     <div class="social-links">
                         <a href="https://www.linkedin.com/in/s%C3%A9bastien-dumur-ab3011339/" target="_blank" class="member-social-btn" title="LinkedIn">
                             <svg style="width:18px;height:18px" viewBox="0 0 24 24"><path fill="currentColor" d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z" /></svg>
@@ -223,7 +223,7 @@ include 'header.php';
                 </div>
                 <div class="card-body">
                     <h3 class="member-name">Thinojan Pulendran</h3>
-                    <div class="member-role">Lead Dev / Dev</div>
+                    <div class="member-role"><?= msg('role_lead_dev') ?></div>
                     <div class="social-links">
                         <a href="https://www.linkedin.com/in/thinojan-p/" target="_blank" class="member-social-btn" title="LinkedIn">
                             <svg style="width:18px;height:18px" viewBox="0 0 24 24"><path fill="currentColor" d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z" /></svg>
@@ -238,7 +238,7 @@ include 'header.php';
                 </div>
                 <div class="card-body">
                     <h3 class="member-name">Gabriel Martin--Victorine</h3>
-                    <div class="member-role">Développeur</div>
+                    <div class="member-role"><?= msg('role_dev') ?></div>
                     <div class="social-links">
                         <a href="https://www.linkedin.com/in/gabriel-martin-victorine-173016318/" target="_blank" class="member-social-btn" title="LinkedIn">
                             <svg style="width:18px;height:18px" viewBox="0 0 24 24"><path fill="currentColor" d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z" /></svg>
@@ -250,7 +250,7 @@ include 'header.php';
         </div>
 
         <div class="footer-actions">
-            <a href="index.php" class="action-btn btn-home">Retour à l'accueil</a>
+            <a href="index.php" class="action-btn btn-home"><?= msg('btn_back_home') ?></a>
             </div>
     </div>
 </div>

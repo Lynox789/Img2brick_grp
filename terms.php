@@ -97,44 +97,44 @@ include 'header.php';
 <div class="legal-container">
     <div class="legal-wrapper">
         
-        <h1>Conditions Générales d'Utilisation (CGU)</h1>
+        <h1><?= msg('terms_title') ?></h1>
 
-        <h2>1. Objet</h2>
-        <p>Les présentes Conditions Générales d'Utilisation ont pour objet de définir les modalités de mise à disposition des services du site <strong>Img2bricks</strong> et les conditions d'utilisation du service par l'utilisateur.</p>
-        <p>Tout accès et/ou utilisation du site suppose l'acceptation et le respect de l'ensemble des termes des présentes conditions.</p>
+        <h2><?= msg('terms_1_title') ?></h2>
+        <p><?= msg('terms_1_text1') ?></p>
+        <p><?= msg('terms_1_text2') ?></p>
 
-        <h2>2. Description des services</h2>
-        <p>Le site Img2bricks est un projet pédagogique permettant aux utilisateurs de :</p>
+        <h2><?= msg('terms_2_title') ?></h2>
+        <p><?= msg('terms_2_intro') ?></p>
         <ul>
-            <li>Créer un compte utilisateur.</li>
-            <li>Télécharger (uploader) des images personnelles.</li>
-            <li>Convertir ces images en plans de construction de type mosaïque (style briques de construction).</li>
+            <li><?= msg('terms_2_li1') ?></li>
+            <li><?= msg('terms_2_li2') ?></li>
+            <li><?= msg('terms_2_li3') ?></li>
         </ul>
-        <p>Le service est fourni à titre gratuit dans le cadre universitaire.</p>
+        <p><?= msg('terms_2_free') ?></p>
 
-        <h2>3. Responsabilité de l'utilisateur</h2>
-        <p>L'utilisateur est responsable des risques liés à l'utilisation de son identifiant et mot de passe. Le mot de passe de l'utilisateur doit rester secret.</p>
-        <p>L'utilisateur s'engage à ne télécharger que des images dont il détient les droits ou qui sont libres de droits. Il est strictement interdit de télécharger :</p>
+        <h2><?= msg('terms_3_title') ?></h2>
+        <p><?= msg('terms_3_text1') ?></p>
+        <p><?= msg('terms_3_text2') ?></p>
         <ul>
-            <li>Des contenus à caractère violent, pornographique ou haineux.</li>
-            <li>Des contenus portant atteinte à la vie privée d'autrui.</li>
-            <li>Des contenus protégés par des droits d'auteur sans autorisation.</li>
+            <li><?= msg('terms_3_li1') ?></li>
+            <li><?= msg('terms_3_li2') ?></li>
+            <li><?= msg('terms_3_li3') ?></li>
         </ul>
-        <p>L'éditeur se réserve le droit de supprimer sans préavis tout contenu ne respectant pas ces règles ou de suspendre le compte de l'utilisateur concerné.</p>
+        <p><?= msg('terms_3_text3') ?></p>
 
-        <h2>4. Propriété intellectuelle</h2>
-        <p>Les images générées (plans de mosaïque) restent la propriété de l'utilisateur pour les images sources qu'il a fournies.</p>
-        <p>La structure générale du site, les textes, graphiques et le code source sont la propriété de l'éditeur (cadre pédagogique), sauf mention contraire.</p>
+        <h2><?= msg('terms_4_title') ?></h2>
+        <p><?= msg('terms_4_text1') ?></p>
+        <p><?= msg('terms_4_text2') ?></p>
 
-        <h2>5. Responsabilité de l'éditeur</h2>
-        <p>Img2bricks étant un projet étudiant, l'éditeur ne saurait être tenu responsable des dysfonctionnements du site, des interruptions de service, ou de la perte de données.</p>
-        <p>Les résultats de la conversion (plans de montage) sont fournis à titre indicatif sans garantie de faisabilité technique parfaite avec des briques réelles.</p>
+        <h2><?= msg('terms_5_title') ?></h2>
+        <p><?= msg('terms_5_text1') ?></p>
+        <p><?= msg('terms_5_text2') ?></p>
 
-        <h2>6. Évolution des conditions</h2>
-        <p>L'éditeur se réserve le droit de modifier les clauses de ces conditions générales d'utilisation à tout moment et sans justification.</p>
+        <h2><?= msg('terms_6_title') ?></h2>
+        <p><?= msg('terms_6_text') ?></p>
 
         <div style="text-align: center;">
-            <a href="index.php" class="back-btn">Retour à l'accueil</a>
+            <a href="index.php" class="back-btn"><?= msg('btn_back_home') ?></a>
         </div>
 
     </div>
