@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
 
             // Check if resolution meets minimum requirements
             if ($imageWidth < $minResolution || $imageHeight < $minResolution) {
-                $errorMessage = msg('error_no_user');
+                $errorMessage = msg('error_resolution');
             } else {
 
                 // Fetch username to organize uploads into user-specific folders
