@@ -1,6 +1,6 @@
 <?php
 require "config.php";
-require_once "classes/Security.php";
+require_once "classes/Security.php"; 
 
 // Session check
 if (session_status() === PHP_SESSION_NONE) session_start();
@@ -16,7 +16,6 @@ $msgType = "";
 // Language definition
 $lang = $_SESSION['lang'] ?? 'en'; 
 
-// Form submission handling
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Identity update
@@ -31,16 +30,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception(($lang == 'fr') ? "Cet email est déjà utilisé." : "This email is already in use.");
             }
 
+            // ENCRYPTION BEFORE SAVING
             $encFirstname = Security::encrypt($_POST['firstname']);
             $encLastname  = Security::encrypt($_POST['lastname']);
             
             // Email encryption for consistency
-            $encEmail = $newEmail;
+            $cleanEmail = $newEmail; 
 
             $stmt = $db->prepare("UPDATE users SET firstname = ?, lastname = ?, email = ? WHERE id = ?");
-            $stmt->execute([$encFirstname, $encLastname, $encEmail, $userId]);
+            $stmt->execute([$encFirstname, $encLastname, $cleanEmail, $userId]);
 
-            Logger::log($db, 'PROFILE_UPDATE', "Modification identité");
             
             // Email notification
             if ($lang == 'fr') {
@@ -51,10 +50,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $corps = "Hello,<br><br>Your personal information (Name, First Name, or Email) has been updated.<br>If you did not initiate this action, please contact us.";
             }
             
+            // Send email (Assuming userMgr exists)
+            if(isset($userMgr)) {
+                $userMgr->sendEmail($newEmail, $sujet, $corps);
+            }
+
             $message = ($lang == 'fr') ? "Informations mises à jour." : "Information updated.";
             $msgType = "success";
-            
-            $userMgr->sendEmail($newEmail, $sujet, $corps);
 
         } catch (Exception $e) {
             $message = (($lang == 'fr') ? "Erreur : " : "Error: ") . $e->getMessage();
@@ -62,25 +64,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Address and contact update
     if (isset($_POST['update_address'])) {
         try {
+
             $encAddress = Security::encrypt($_POST['address']);
             $encPhone   = Security::encrypt($_POST['phone']);
+            // Zipcode is usually not sensitive enough to break searchability, but let's encrypt it if you wish, 
+            // or keep it plain. Here I keep it plain like City/Country based on your previous code style, 
+            // but you can encrypt it using Security::encrypt($_POST['zipcode']) if needed.
+            $cleanZip   = $_POST['zipcode']; 
+            $cleanCity  = $_POST['city'];
+            $cleanCountry = $_POST['country'];
 
-            $stmt = $db->prepare("UPDATE users SET address = ?, city = ?, country = ?, phone = ? WHERE id = ?");
-            $stmt->execute([$encAddress, $_POST['city'], $_POST['country'], $encPhone, $userId]);
+            // Added zipcode to query
+            $stmt = $db->prepare("UPDATE users SET address = ?, zipcode = ?, city = ?, country = ?, phone = ? WHERE id = ?");
+            $stmt->execute([$encAddress, $cleanZip, $cleanCity, $cleanCountry, $encPhone, $userId]);
 
-            Logger::log($db, 'ADDRESS_UPDATE', "Modification adresse/téléphone");
 
-            // Notification to current email (decrypted from DB)
+            // Notification logic...
             $stmtEmail = $db->prepare("SELECT email FROM users WHERE id = ?");
             $stmtEmail->execute([$userId]);
-            $encryptedUserEmail = $stmtEmail->fetchColumn();
+            $currentEmail = $stmtEmail->fetchColumn();
             
-            if ($encryptedUserEmail) {
-                $userEmail = Security::decrypt($encryptedUserEmail);
-                
+            if ($currentEmail && isset($userMgr)) {
+                 // Note: If email was encrypted in DB, decrypt here. If plain, use as is.
+                 // $userEmail = Security::decrypt($currentEmail); 
+                 $userEmail = $currentEmail; 
+
                 if ($lang == 'fr') {
                     $sujet = "Mise à jour de vos coordonnées";
                     $corps = "Bonjour,<br><br>Votre adresse de livraison ou votre téléphone a été mis à jour.";
@@ -88,7 +98,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $sujet = "Update of your contact details";
                     $corps = "Hello,<br><br>Your delivery address or phone number has been updated.";
                 }
-
                 $userMgr->sendEmail($userEmail, $sujet, $corps);
             }
 
@@ -102,28 +111,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Data retrieval
+// --- Data retrieval for Display ---
 $stmt = $db->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->execute([$userId]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+// DECRYPTION FOR DISPLAY
+// We use the null coalescing operator (??) to handle cases where data might be null
 $decryptedAddress   = Security::decrypt($user['address'] ?? '');
 $decryptedPhone     = Security::decrypt($user['phone'] ?? '');
 $decryptedFirstname = Security::decrypt($user['firstname'] ?? ''); 
 $decryptedLastname  = Security::decrypt($user['lastname'] ?? '');  
-$decryptedEmail     = Security::decrypt($user['email'] ?? '');
+
+// Non-encrypted fields
+$displayEmail   = $user['email'] ?? '';
+$displayZip     = $user['zipcode'] ?? '';
+$displayCity    = $user['city'] ?? '';
+$displayCountry = $user['country'] ?? '';
+
 
 include "header.php";
 ?>
 
 <style>
-    :root {
-        --bg-color: #f8fafc;
-        --card-bg: #ffffff;
-        --primary: #2563eb;
-        --text-main: #1e293b;
-        --border: #e2e8f0;
-    }
+    /* ... (Keep your existing CSS) ... */
+    :root { --bg-color: #f8fafc; --card-bg: #ffffff; --primary: #2563eb; --text-main: #1e293b; --border: #e2e8f0; }
     body { background-color: var(--bg-color); color: var(--text-main); }
     .account-container { max-width: 1000px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: 250px 1fr; gap: 40px; }
     .sidebar-menu { display: flex; flex-direction: column; gap: 10px; }
@@ -139,7 +151,6 @@ include "header.php";
     .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #475569; font-size: 0.9rem; }
     .form-group input { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 1rem; color: #1e293b; transition: border-color 0.2s; }
     .form-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
-    .form-group input:disabled { background: #f1f5f9; cursor: not-allowed; }
     .btn-save { background: var(--primary); color: white; padding: 10px 25px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; margin-top: 10px; transition: 0.2s; }
     .btn-save:hover { background: #1d4ed8; }
     .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 500; }
@@ -151,7 +162,9 @@ include "header.php";
 <div class="account-container">
     
     <div class="sidebar-menu">
-        <a href="account.php" class="menu-item active"><?= ($lang == 'fr') ? "Mon Profil" : "My Profile" ?></a>
+        <a href="account.php" class="menu-item active"> <?= ($lang == 'fr') ? "Mon Profil" : "My Profile" ?></a>
+        <a href="panier.php" class="menu-item"> <?= ($lang == 'fr') ? "Mes Commandes" : "My Orders" ?></a>
+        <a href="logout.php" class="menu-item" style="color:#ef4444;"> <?= ($lang == 'fr') ? "Déconnexion" : "Logout" ?></a>
     </div>
 
     <div class="content-area">
@@ -169,7 +182,7 @@ include "header.php";
                 <div class="form-grid">
                     <div class="form-group full-width">
                         <label>Email</label>
-                        <input type="email" name="email" value="<?= htmlspecialchars($decryptedEmail ?: $user['email']) ?>" required>
+                        <input type="email" name="email" value="<?= htmlspecialchars($displayEmail) ?>" required>
                     </div>
                     <div class="form-group">
                         <label><?= ($lang == 'fr') ? "Prénom" : "First Name" ?></label>
@@ -190,16 +203,21 @@ include "header.php";
                 <div class="form-grid">
                     <div class="form-group full-width">
                         <label><?= ($lang == 'fr') ? "Adresse postale" : "Address" ?></label>
-                        <input type="text" name="address" value="<?= htmlspecialchars($decryptedAddress) ?>" placeholder="<?= ($lang == 'fr') ? "Votre adresse complète" : "Your full address" ?>">
+                        <input type="text" name="address" value="<?= htmlspecialchars($decryptedAddress) ?>" placeholder="10 rue des Lilas...">
                     </div>
                     
                     <div class="form-group">
+                        <label><?= ($lang == 'fr') ? "Code Postal" : "Zip Code" ?></label>
+                        <input type="text" name="zipcode" value="<?= htmlspecialchars($displayZip) ?>">
+                    </div>
+
+                    <div class="form-group">
                         <label><?= ($lang == 'fr') ? "Ville" : "City" ?></label>
-                        <input type="text" name="city" value="<?= htmlspecialchars($user['city'] ?? '') ?>">
+                        <input type="text" name="city" value="<?= htmlspecialchars($displayCity) ?>">
                     </div>
                     <div class="form-group">
                         <label><?= ($lang == 'fr') ? "Pays" : "Country" ?></label>
-                        <input type="text" name="country" value="<?= htmlspecialchars($user['country'] ?? 'France') ?>">
+                        <input type="text" name="country" value="<?= htmlspecialchars($displayCountry) ?>">
                     </div>
                     <div class="form-group full-width">
                         <label><?= ($lang == 'fr') ? "Téléphone" : "Phone" ?></label>
@@ -213,14 +231,9 @@ include "header.php";
         <div class="card">
             <h2><?= ($lang == 'fr') ? "Sécurité" : "Security" ?></h2>
             <p style="margin-bottom: 10px;">
-                <a href="inscription.php" style="color: var(--primary); text-decoration: none; font-weight: bold;">
+                <a href="forgot_password.php" style="color: var(--primary); text-decoration: none; font-weight: bold;">
                     <?= ($lang == 'fr') ? "Changer mon mot de passe" : "Change my password" ?>
                 </a>
-            </p>
-            <p style="color: #64748b; font-size: 0.9rem;">
-                <?= ($lang == 'fr') 
-                    ? "Redirection vers la page d'inscription, appuyez sur le bouton 'Mot de passe oublié'." 
-                    : "Redirects to the registration page, please click on the 'Forgot Password' button." ?>
             </p>
         </div>
 

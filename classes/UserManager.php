@@ -16,7 +16,7 @@ class UserManager {
     }
 
     // Registration
-    public function register(string $username, string $email, string $password) {
+    public function register(string $username, string $email, string $password, array $profileData = []) {
         // If email exists but is NOT verified, delete it to start fresh
         $check = $this->pdo->prepare("SELECT id, is_verified FROM users WHERE email = ?");
         $check->execute([$email]);
@@ -33,22 +33,44 @@ class UserManager {
 
         //Create the new account
         $hash = password_hash($password, PASSWORD_ARGON2ID);
+
+        $encFirstname = Security::encrypt($profileData['firstname'] ?? '');
+        $encLastname  = Security::encrypt($profileData['lastname'] ?? '');
+        $encPhone     = Security::encrypt($profileData['phone'] ?? '');
+        $encAddress   = Security::encrypt($profileData['address'] ?? '');
+
+        $zipcode = $profileData['zipcode'] ?? '';
+        $city    = $profileData['city'] ?? '';
+        $country = $profileData['country'] ?? '';
+
         //Using 'is_verified' set to 0 by default
-        $sql = "INSERT INTO users (username, email, password, is_verified) VALUES (:u, :e, :p, 0)";
+        $sql = "INSERT INTO users (
+                    username, email, password, is_verified, firstname, lastname, phone, address, zipcode, city, country, created_at) 
+                    VALUES (:u, :e, :p, 0, :fn, :ln, :ph, :ad, :zp, :ci, :co, NOW()
+                )";
         
         try {
             $stmt = $this->pdo->prepare($sql);
             $success = $stmt->execute([
                 ':u' => $username, 
                 ':e' => $email, 
-                ':p' => $hash
+                ':p' => $hash,
+                ':fn' => $encFirstname,
+                ':ln' => $encLastname,
+                ':ph' => $encPhone,
+                ':ad' => $encAddress,
+                ':zp' => $zipcode,
+                ':ci' => $city,
+                ':co' => $country
             ]);
 
             if ($success) {
                 $newId = $this->pdo->lastInsertId();
 
+                $realLastname = $profileData['lastname'] ?? '';
+                $realFirstname = $profileData['firstname'] ?? '';
                 // Ensure billing customer exists
-                $this->ensureClientExists($newId, $username, $email);
+                $this->ensureClientExists($newId, $username, $email, $realLastname, $realFirstname);
                 return $newId;
             }
             return false;

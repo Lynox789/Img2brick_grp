@@ -15,6 +15,7 @@ $userData = null;
 $emailSent = false;
 $activeForm = 'login';
 
+$lang = $_SESSION['lang'] ?? 'en';
 // Check for success flag in URL
 if (isset($_GET['signup_success'])) {
     $successNotification = msg('signup_success_notif');
@@ -44,6 +45,16 @@ if (isset($_POST['register'])) {
             $usernameInput = str_pad(random_int(0, 99999999), 8, '0', STR_PAD_LEFT);  //create a random number for the folder name of the user
             $emailInput = $_POST['email'];
             $passwordInput = $_POST['password'];
+
+            $profileData = [
+                'firstname' => $_POST['firstname'] ?? '',
+                'lastname'  => $_POST['lastname'] ?? '',
+                'phone'     => $_POST['phone'] ?? '',
+                'address'   => $_POST['address'] ?? '',
+                'zipcode'   => $_POST['zipcode'] ?? '',
+                'city'      => $_POST['city'] ?? '',
+                'country'   => $_POST['country'] ?? ''
+            ];
 
             // Attempt to register the user
             $newUserId = $userMgr->register($usernameInput, $emailInput, $passwordInput);
@@ -141,155 +152,85 @@ if (isset($_POST['login'])) {
 <head>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <style>
-        * { box-sizing: border-box; }
+    * { box-sizing: border-box; }
     body {
         font-family: 'Poppins', sans-serif;
         background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
         min-height: 100vh;
-        display: flex; 
-        flex-direction: column; 
-        margin: 0;
-        padding-top: 80px; 
+        display: flex; flex-direction: column; margin: 0; padding-top: 80px; 
     }
 
     .login-container {
-        flex: 1; 
-        display: flex;
-        align-items: center; 
-        justify-content: center; 
-        width: 100%;
-        padding: 20px; 
+        flex: 1; display: flex; align-items: center; justify-content: center; 
+        width: 100%; padding: 20px; 
     }
 
     .wrapper {
         background: #fff;
-        height: 500px; 
-        width: 450px;
+        /* Hauteur automatique pour s'adapter au grand formulaire */
+        min-height: 550px; 
+        width: 500px; /* Un peu plus large pour les colonnes */
         max-width: 100%;
         border-radius: 20px;
         box-shadow: 0 15px 20px rgba(0,0,0,0.1);
         overflow: hidden; 
         position: relative;
+        transition: height 0.3s ease;
     }
-
 
     .slide-container {
-        width: 200%; 
-        display: flex;
+        width: 200%; display: flex;
         transition: transform 0.6s ease-in-out;
+        align-items: flex-start; /* Aligner en haut pour éviter les vides */
     }
-    .form-box {
-        width: 50%;
-        padding: 0 10px;
-        box-sizing: border-box;
-    }
+    .form-box { width: 50%; padding: 0 30px 30px 30px; box-sizing: border-box; }
+    
     .title-text {
-        font-size: 25px;
-        font-weight: 600;
-        text-align: center;
-        margin-bottom: 20px;
-        color: #333;
-        margin-top: 20px;
+        font-size: 25px; font-weight: 600; text-align: center;
+        margin-bottom: 20px; color: #333; margin-top: 20px;
     }
-    .field {
-        height: 50px;
-        width: 100%;
-        margin-top: 20px;
-        position: relative;
-    }
+    
+    /* Styles des champs */
+    .field { height: 50px; width: 100%; margin-top: 15px; position: relative; }
     .field input {
-        height: 100%;
-        width: 100%;
-        outline: none;
-        padding-left: 15px;
-        border-radius: 5px;
-        border: 1px solid lightgrey;
-        font-size: 16px;
+        height: 100%; width: 100%; outline: none; padding-left: 15px;
+        border-radius: 5px; border: 1px solid lightgrey; font-size: 15px;
         transition: all 0.3s ease;
-        box-sizing: border-box;
     }
-    .field input:focus {
-        border-color: #4A90E2;
-        box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
-    }
+    .field input:focus { border-color: #4A90E2; box-shadow: 0 0 5px rgba(74, 144, 226, 0.3); }
+
+    /* Grille pour mettre 2 champs sur la même ligne (Nom/Prénom, Ville/CP) */
+    .row-group { display: flex; gap: 10px; margin-top: 15px; }
+    .row-group .field { margin-top: 0; }
+    
     button[type="submit"] {
-        margin-top: 20px;
-        width: 100%;
-        height: 50px;
-        border: none;
-        border-radius: 5px;
-        color: #fff;
-        font-size: 18px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        background: #4A90E2; 
+        margin-top: 20px; width: 100%; height: 50px; border: none;
+        border-radius: 5px; color: #fff; font-size: 18px; font-weight: 500;
+        cursor: pointer; transition: all 0.3s ease; background: #4A90E2; 
     }
-    button[type="submit"]:disabled {
-        background: #ccc;
-        cursor: not-allowed;
-    }
-    button[type="submit"]:hover:not(:disabled) {
-        opacity: 0.9;
-    }
-    .link {
-        text-align: center;
-        margin-top: 20px;
-        font-size: 14px;
-    }
-    .link a {
-        color: #4A90E2;
-        text-decoration: none;
-    }
-    .link a:hover {
-        text-decoration: underline;
-    }
-    .pass-link {
-        text-align: left; 
-        margin-top: 10px; 
-        font-size: 14px;
-    }
-    .pass-link a { 
-        color: #888; 
-        text-decoration: none; 
-    }
-    .pass-link a:hover { 
-        color: #4A90E2; 
-    }
-    .error { 
-        background: #ffebee; 
-        color: #c62828; 
-        padding: 10px; 
-        border-radius: 5px; 
-        font-size: 14px; 
-        text-align: center;
-        margin: 10px;
-    }
-    .success { 
-        background: #e8f5e9; 
-        color: #2e7d32; 
-        padding: 10px; 
-        border-radius: 5px; 
-        font-size: 14px; 
-        text-align: center;
-        margin: 10px;
-    }
-    .cf-turnstile {
-        margin-top: 15px;
-        display: flex;
-        justify-content: center;
-    }
+    button[type="submit"]:disabled { background: #ccc; cursor: not-allowed; }
+    button[type="submit"]:hover:not(:disabled) { opacity: 0.9; }
+
+    .link { text-align: center; margin-top: 20px; font-size: 14px; }
+    .link a { color: #4A90E2; text-decoration: none; }
+    .link a:hover { text-decoration: underline; }
+    
+    .pass-link { text-align: left; margin-top: 10px; font-size: 14px; }
+    .pass-link a { color: #888; text-decoration: none; }
+    
+    .error { background: #ffebee; color: #c62828; padding: 10px; border-radius: 5px; margin: 10px; text-align: center; }
+    .success { background: #e8f5e9; color: #2e7d32; padding: 10px; border-radius: 5px; margin: 10px; text-align: center; }
+    
+    .cf-turnstile { margin-top: 15px; display: flex; justify-content: center; }
     </style>
 </head>
 
 <div class="login-container">
-
-    <div class="wrapper">
+    <div class="wrapper" id="mainWrapper">
         
         <?php if($statusMessage): ?>
             <div class="error"><?= htmlspecialchars($statusMessage) ?></div>
         <?php endif; ?>
-
         <?php if($successNotification): ?>
             <div class="success"><?= htmlspecialchars($successNotification) ?></div>
         <?php endif; ?>
@@ -323,14 +264,48 @@ if (isset($_POST['login'])) {
             <div class="form-box register">
                 <div class="title-text"><?= msg('title_register') ?></div>
                 <form method="post" action="#">
+                    
+                    <div class="row-group">
+                        <div class="field">
+                            <input type="text" name="firstname" placeholder="<?= msg('placeholder_firstname') ?>" required>
+                        </div>
+                        <div class="field">
+                            <input type="text" name="lastname" placeholder="<?= msg('placeholder_lastname') ?>" required>
+                        </div>
+                    </div>
+
                     <div class="field">
                         <input type="email" name="email" placeholder="<?= msg('placeholder_email') ?>" required>
                     </div>
+
                     <div class="field">
-                        <input type="password" name="password" placeholder="<?= msg('placeholder_password') ?>" required>
+                        <input type="tel" name="phone" placeholder="<?= msg('placeholder_phone') ?>" required>
                     </div>
+
                     <div class="field">
-                        <input type="password" name="confirm_password" placeholder="<?= ($_SESSION['lang'] == 'fr') ? 'Confirmer le mot de passe' : 'Confirm Password' ?>" required>
+                        <input type="text" name="address" placeholder="<?= msg('placeholder_address') ?>" required>
+                    </div>
+
+                    <div class="row-group">
+                        <div class="field">
+                            <input type="text" name="zipcode" placeholder="<?= msg('placeholder_zipcode') ?>" required>
+                        </div>
+                        <div class="field">
+                            <input type="text" name="city" placeholder="<?= msg('placeholder_city') ?>" required>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <input type="text" name="country" placeholder="<?= msg('placeholder_country') ?>" required>
+                    </div>
+
+                    <div class="row-group">
+                        <div class="field">
+                            <input type="password" name="password" placeholder="<?= msg('placeholder_password') ?>" required>
+                        </div>
+                        <div class="field">
+                            <input type="password" name="confirm_password" placeholder="Confirm" required>
+                        </div>
                     </div>
 
                     <div class="cf-turnstile" data-sitekey="" data-callback="onCaptchaSuccessReg"></div>
@@ -351,23 +326,36 @@ if (isset($_POST['login'])) {
 
 <script>
     const slideContainer = document.getElementById("slideContainer");
-    let currentMargin = "0%";
+    const wrapper = document.getElementById("mainWrapper");
+    
+    // Ajuster la hauteur dynamiquement car le register est beaucoup plus grand
+    function adjustHeight(formType) {
+        if (formType === 'register') {
+            wrapper.style.minHeight = "850px"; // Grand formulaire
+        } else {
+            wrapper.style.minHeight = "550px"; // Petit formulaire
+        }
+    }
+
     <?php if($activeForm === 'register'): ?>
         slideContainer.style.transform = "translateX(-50%)";
+        adjustHeight('register');
     <?php else: ?>
         slideContainer.style.transform = "translateX(0%)";
+        adjustHeight('login');
     <?php endif; ?>
 
     function switchToRegister(e) {
         e.preventDefault();
         slideContainer.style.transform = "translateX(-50%)";
+        adjustHeight('register');
     }
 
     function switchToLogin(e) {
         e.preventDefault();
         slideContainer.style.transform = "translateX(0%)";
+        adjustHeight('login');
     }
-
 
     function onCaptchaSuccessReg() { document.getElementById('btn-reg').disabled = false; }
     function onCaptchaSuccessLog() { document.getElementById('btn-log').disabled = false; }

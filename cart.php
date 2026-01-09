@@ -42,17 +42,17 @@ $price = $proposal['estimated_cost'] > 0 ? $proposal['estimated_cost'] : ($propo
     <?php if ($isError): ?>
         
         <div class="alert error" style="background:#fee2e2; color:#991b1b; padding:20px; border-radius:8px; text-align:center;">
-            <h3>Oups ! Une erreur est survenue.</h3>
-            <p>L'algorithme de calcul a rencontré un problème.</p>
-            <a href="upload.php" class="btn">Recommencer</a>
+            <h3><?= msg('cart_error_title') ?></h3>
+            <p><?= msg('cart_error_desc') ?></p>
+            <a href="upload.php" class="btn"><?= msg('btn_restart') ?></a>
         </div>
 
     <?php elseif (!$isReady): ?>
 
         <div class="loading-state" style="text-align:center; padding: 50px; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
             <div class="spinner"></div>
-            <h2 style="color: var(--accent); margin-top: 20px;">Calcul des pièces en cours...</h2>
-            <p style="color: #64748b;">Nos robots analysent votre image pour optimiser le nombre de briques.</p>
+            <h2 style="color: var(--accent); margin-top: 20px;"><?= msg('cart_loading_title') ?></h2>
+            <p style="color: #64748b;"><?= msg('cart_loading_desc') ?></p>
             
             <script>
                 setTimeout(function(){
@@ -66,7 +66,7 @@ $price = $proposal['estimated_cost'] > 0 ? $proposal['estimated_cost'] : ($propo
         <div class="cart-success" style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
             
             <div style="background: var(--accent); color: white; padding: 20px; text-align: center;">
-                <h2 style="margin:0;">Votre kit est prêt !</h2>
+                <h2 style="margin:0;"><?= msg('cart_success_title') ?></h2>
             </div>
 
             <div style="padding: 30px; display: flex; flex-wrap: wrap; gap: 30px; align-items: center;">
@@ -78,22 +78,22 @@ $price = $proposal['estimated_cost'] > 0 ? $proposal['estimated_cost'] : ($propo
                 <div style="flex: 1; min-width: 250px;">
                     <ul style="list-style: none; padding: 0; font-size: 1.1rem;">
                         <li style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-                            <strong>Dimensions :</strong> <?= $proposal['resolution'] ?> tenons
+                            <strong><?= msg('lbl_dimensions') ?></strong> <?= $proposal['resolution'] ?> <?= msg('unit_studs') ?>
                         </li>
                         <li style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-                            <strong>Total Briques :</strong> <span style="color: var(--accent); font-weight: bold;"><?= $proposal['total_bricks_count'] ?></span> pièces
+                            <strong><?= msg('lbl_total_bricks') ?></strong> <span style="color: var(--accent); font-weight: bold;"><?= $proposal['total_bricks_count'] ?></span> <?= msg('unit_pieces') ?>
                         </li>
                         <li style="margin-bottom: 15px; font-size: 1.4rem; color: #166534;">
-                            <strong>Prix Estimé :</strong> <?= number_format($price, 2) ?> €
+                            <strong><?= msg('lbl_estimated_price') ?></strong> <?= number_format($price, 2) ?> €
                         </li>
                     </ul>
 
                     <div style="margin-top: 30px; display: grid; gap: 10px;">
                         <a href="checkout.php" class="btn-primary" style="text-align: center; text-decoration: none; padding: 15px; background: #166534; color: white; border-radius: 8px; font-weight: bold;">
-                            Procéder au paiement
+                            <?= msg('btn_proceed_checkout') ?>
                         </a>
                         <a href="results.php" style="text-align: center; color: #64748b; text-decoration: none; font-size: 0.9rem;">
-                            Modifier le choix du rendu
+                            <?= msg('link_modify_choice') ?>
                         </a>
                     </div>
                 </div>

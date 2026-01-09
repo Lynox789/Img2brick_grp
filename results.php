@@ -42,7 +42,7 @@ if (isset($_POST['choose_render']) && isset($_POST['proposal_id']) && isset($_PO
 
     <div style="text-align:center; margin-bottom:40px;">
         <h2 style="color: var(--text); margin-bottom:10px;"><?= msg('results_title') ?></h2>
-        <p style="color: #64748b;">Chaque rendu utilise un algorithme de construction différent.</p>
+        <p style="color: #64748b;"><?= msg('results_subtitle') ?></p>
     </div>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
@@ -50,8 +50,8 @@ if (isset($_POST['choose_render']) && isset($_POST['proposal_id']) && isset($_PO
         <?php if (empty($proposals)): ?>
             <div style="grid-column: 1/-1; text-align: center; padding: 60px; background:white; border-radius:12px; box-shadow:0 4px 6px rgba(0,0,0,0.05);">
                 <div class="spinner" style="margin:0 auto 20px; border-top-color:var(--accent);"></div>
-                <h3 style="color:var(--text);">Génération des variantes...</h3>
-                <p style="color:#64748b;">Le moteur Java prépare vos mosaïques.</p>
+                <h3 style="color:var(--text);"><?= msg('generating_variants_title') ?></h3>
+                <p style="color:#64748b;"><?= msg('generating_variants_desc') ?></p>
                 <script>
                     setTimeout(() => window.location.reload(), 3000);
                 </script>
@@ -64,23 +64,22 @@ if (isset($_POST['choose_render']) && isset($_POST['proposal_id']) && isset($_PO
                 $imgFile = "uploads/preview_" . $p['id'] . ".png";
                 $isReady = file_exists($imgFile);
 
-                // CONFIGURATION BY STYLE
-                // This is where we define which Algo C corresponds to which visual style
+                // CONFIGURATION BY STYLE (TRADUCTION DYNAMIQUE)
                 $title = "";
                 $desc = "";
                 $algoTarget = 5; // Default value
 
                 if ($rawStyle === 'BICUBIC') {
-                    $title = "Rendu Lisse (Fusion)";
-                    $desc = "Utilise l'algorithme <b>Fusion (3)</b>.<br>Idéal pour les dégradés.";
+                    $title = msg('style_title_bicubic');
+                    $desc = msg('style_desc_bicubic');
                     $algoTarget = 3;
                 } elseif ($rawStyle === 'BILINEAR') {
-                    $title = "Rendu Équilibré";
-                    $desc = "Utilise l'algorithme <b>Prix/Qualité (4)</b>.<br>Bon compromis.";
+                    $title = msg('style_title_bilinear');
+                    $desc = msg('style_desc_bilinear');
                     $algoTarget = 4;
                 } elseif ($rawStyle === 'NEAREST') {
-                    $title = "Rendu Pixel Art";
-                    $desc = "Utilise l'algorithme <b>Optimal (5)</b>.<br>Respect strict des pixels.";
+                    $title = msg('style_title_nearest');
+                    $desc = msg('style_desc_nearest');
                     $algoTarget = 5;
                 }
                 ?>
@@ -97,13 +96,13 @@ if (isset($_POST['choose_render']) && isset($_POST['proposal_id']) && isset($_PO
                                 style="
                                     width: 100%; 
                                     height: 100%; 
-                                    object-fit: contain; /* L'image garde ses proportions sans être déformée */
+                                    object-fit: contain; 
                                     filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));
                                  ">
                         <?php else: ?>
                             <div style="color:white; text-align:center;">
                                 <div class="spinner" style="border-top-color:white; margin-bottom:10px;"></div>
-                                <small>Calcul en cours...</small>
+                                <small><?= msg('card_loading_text') ?></small>
                             </div>
                             <script>
                                 setTimeout(() => window.location.reload(), 2000);
@@ -122,12 +121,12 @@ if (isset($_POST['choose_render']) && isset($_POST['proposal_id']) && isset($_PO
                                 <input type="hidden" name="algo_target" value="<?= $algoTarget ?>">
 
                                 <button type="submit" name="choose_render" class="btn-primary" style="width: 100%; padding:12px; font-size:1rem;">
-                                    Choisir ce style
+                                    <?= msg('btn_choose_style') ?>
                                 </button>
                             </form>
                         <?php else: ?>
                             <button disabled style="width: 100%; padding: 12px; background: #cbd5e1; border:none; border-radius:8px; cursor: not-allowed; color:white;">
-                                ...
+                                <?= msg('btn_loading_dots') ?>
                             </button>
                         <?php endif; ?>
                     </div>
@@ -139,7 +138,6 @@ if (isset($_POST['choose_render']) && isset($_POST['proposal_id']) && isset($_PO
 </div>
 
 <?php include "footer.php"; ?>
-
 <style>
     .spinner {
         width: 30px;
