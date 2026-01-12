@@ -38,14 +38,14 @@ if (isset($_POST['choose_render']) && isset($_POST['proposal_id']) && isset($_PO
 
 <?php include "header.php"; ?>
 
-<div class="container" style="max-width: 1200px; margin: 0 auto; padding: 40px 20px;">
+<div class="container" style="max-width: 95%; margin: 0 auto; padding: 40px 20px;">
 
     <div style="text-align:center; margin-bottom:40px;">
         <h2 style="color: var(--text); margin-bottom:10px;"><?= msg('results_title') ?></h2>
         <p style="color: #64748b;"><?= msg('results_subtitle') ?></p>
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
 
         <?php if (empty($proposals)): ?>
             <div style="grid-column: 1/-1; text-align: center; padding: 60px; background:white; border-radius:12px; box-shadow:0 4px 6px rgba(0,0,0,0.05);">
