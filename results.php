@@ -17,21 +17,13 @@ $proposals = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // 2. Processing the 'ORDER' Click
 if (isset($_POST['choose_render']) && isset($_POST['proposal_id']) && isset($_POST['algo_target'])) {
-
     $selectedPropId = intval($_POST['proposal_id']);
     $algoId = intval($_POST['algo_target']); // The ID of the algorithm C (3, 4 or 5)
-
-    // Building the strategy for Java: "ALGO_3", "ALGO_4", etc.
     $newStrategy = "ALGO_" . $algoId;
-
-    // Update BDD: We change the mode and reset the counter to wake up Java
     $upd = $db->prepare("UPDATE mosaic_proposals SET strategy = ?, total_bricks_count = 0 WHERE id = ?");
     $upd->execute([$newStrategy, $selectedPropId]);
-
-    // Save for the cart
     $_SESSION['final_proposal_id'] = $selectedPropId;
-
-    header("Location: cart.php"); // Redirection to the basket
+    header("Location: cart.php"); 
     exit;
 }
 ?>
@@ -52,9 +44,7 @@ if (isset($_POST['choose_render']) && isset($_POST['proposal_id']) && isset($_PO
                 <div class="spinner" style="margin:0 auto 20px; border-top-color:var(--accent);"></div>
                 <h3 style="color:var(--text);"><?= msg('generating_variants_title') ?></h3>
                 <p style="color:#64748b;"><?= msg('generating_variants_desc') ?></p>
-                <script>
-                    setTimeout(() => window.location.reload(), 3000);
-                </script>
+                <script>setTimeout(() => window.location.reload(), 3000);</script>
             </div>
         <?php else: ?>
 
@@ -64,10 +54,18 @@ if (isset($_POST['choose_render']) && isset($_POST['proposal_id']) && isset($_PO
                 $imgFile = "uploads/preview_" . $p['id'] . ".png";
                 $isReady = file_exists($imgFile);
 
-                // CONFIGURATION BY STYLE (TRADUCTION DYNAMIQUE)
-                $title = "";
-                $desc = "";
-                $algoTarget = 5; // Default value
+                // Variables for the grid
+                $imgWidth = 32; // Security default value
+                $imgHeight = 32;
+
+                if ($isReady) {
+                    // we retrieve the true size of the table
+                    list($w, $h) = getimagesize($imgFile);
+                    $imgWidth = $w;
+                    $imgHeight = $h;
+                }
+
+                $title = ""; $desc = ""; $algoTarget = 5;
 
                 if ($rawStyle === 'BICUBIC') {
                     $title = msg('style_title_bicubic');
@@ -92,13 +90,16 @@ if (isset($_POST['choose_render']) && isset($_POST['proposal_id']) && isset($_PO
 
                     <div style="background: #0f172a; padding: 20px; display: flex; align-items: center; justify-content: center; height: 350px;">
                         <?php if ($isReady): ?>
-                            <img src="<?= $imgFile ?>?t=<?= time() ?>" alt="<?= $title ?>"
+                            
+                            <img src="render_lego.php?id=<?= $p['id'] ?>&t=<?= time() ?>" 
+                                alt="<?= $title ?>"
                                 style="
-                                    width: 100%; 
-                                    height: 100%; 
-                                    object-fit: contain; 
-                                    filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));
-                                 ">
+                                    width: 100%;
+                                    height: 100%;
+                                    object-fit: contain;
+                                    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+                                ">
+
                         <?php else: ?>
                             <div style="color:white; text-align:center;">
                                 <div class="spinner" style="border-top-color:white; margin-bottom:10px;"></div>
@@ -114,20 +115,16 @@ if (isset($_POST['choose_render']) && isset($_POST['proposal_id']) && isset($_PO
                         <p style="text-align:center; font-size:0.9rem; color:#64748b; margin-bottom: 20px;">
                             <?= $desc ?>
                         </p>
-
                         <?php if ($isReady): ?>
                             <form method="post">
                                 <input type="hidden" name="proposal_id" value="<?= $p['id'] ?>">
                                 <input type="hidden" name="algo_target" value="<?= $algoTarget ?>">
-
                                 <button type="submit" name="choose_render" class="btn-primary" style="width: 100%; padding:12px; font-size:1rem;">
                                     <?= msg('btn_choose_style') ?>
                                 </button>
                             </form>
                         <?php else: ?>
-                            <button disabled style="width: 100%; padding: 12px; background: #cbd5e1; border:none; border-radius:8px; cursor: not-allowed; color:white;">
-                                <?= msg('btn_loading_dots') ?>
-                            </button>
+                            <button disabled style="...">...</button>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -138,30 +135,59 @@ if (isset($_POST['choose_render']) && isset($_POST['proposal_id']) && isset($_PO
 </div>
 
 <?php include "footer.php"; ?>
+
 <style>
     .spinner {
-        width: 30px;
-        height: 30px;
-        border: 3px solid rgba(0, 0, 0, 0.1);
-        border-radius: 50%;
-        border-top-color: var(--accent);
-        animation: spin 1s linear infinite;
-        margin: 0 auto;
+        width: 30px; height: 30px; border: 3px solid rgba(0, 0, 0, 0.1); border-radius: 50%;
+        border-top-color: var(--accent); animation: spin 1s linear infinite; margin: 0 auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .card { transition: transform 0.2s; border: 1px solid #e2e8f0; }
+    .card:hover { transform: translateY(-5px); border-color: var(--accent); }
+
+    .mosaic-wrapper {
+        position: relative;
+        height: 100%;
+        width: auto;
+        max-width: 100%;
+        /* Shadow under the global plate */
+        box-shadow: 0 10px 25px rgba(0,0,0,0.4); 
     }
 
-    @keyframes spin {
-        to {
-            transform: rotate(360deg);
-        }
+    .mosaic-wrapper img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: fill;
+        
+        /* Essential to keep pixels square and sharp */
+        image-rendering: pixelated; 
+        image-rendering: -moz-crisp-edges;
+        image-rendering: crisp-edges;
     }
 
-    .card {
-        transition: transform 0.2s;
-        border: 1px solid #e2e8f0;
-    }
+    .grid-overlay {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none;
+        background-image: 
+            radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 15%),
+            radial-gradient(circle at 50% 50%, 
+                transparent 56%,          
+                rgba(0, 0, 0, 0.15) 57%,
+                rgba(0, 0, 0, 0.5) 63%,  
+                transparent 65%     
+            ),
 
-    .card:hover {
-        transform: translateY(-5px);
-        border-color: var(--accent);
+            radial-gradient(circle at 50% 50%, 
+                transparent 56%, 
+                rgba(0, 0, 0, 0.1) 57%
+            ),
+            linear-gradient(to right, rgba(0, 0, 0, 0.15) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(0, 0, 0, 0.15) 1px, transparent 1px);
+        
+        background-size: calc(100% / var(--grid-x)) calc(100% / var(--grid-y));
+        
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
     }
 </style>
