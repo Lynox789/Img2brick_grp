@@ -418,6 +418,7 @@ include "header.php";
                     <div style="background:#dcfce7; padding:10px; border-radius:6px; color:#166534;">
                         <?= msg('status_connected') ?>
                     </div>
+                    <div class="cf-turnstile" data-sitekey="" data-callback="unlockButton" ></div>
                 <?php else: ?>
                     <label style="background:#eff6ff; padding:10px; border-radius:6px; margin-bottom:15px; display:block; cursor:pointer;">
                         <input type="checkbox" name="has_account" value="1" onchange="toggleAuth(this)"> <?= msg('lbl_have_account') ?>
