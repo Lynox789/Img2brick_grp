@@ -89,9 +89,21 @@ if (isset($_POST['choose_render']) && isset($_POST['proposal_id']) && isset($_PO
 
                     <div class="card-image-box">
                         <?php if ($isReady): ?>
-                            <img src="render_lego.php?id=<?= $p['id'] ?>&t=<?= time() ?>" 
-                                 alt="<?= $title ?>"
-                                 class="preview-img">
+                            <?php $imgSrc = "render_lego.php?id=" . $p['id'] . "&t=" . time(); ?>
+                            
+                            <img src="<?= $imgSrc ?>" 
+                                alt="<?= $title ?>"
+                                class="preview-img">
+                            <!--Button for zoom of the image -->
+                            <button type="button" class="btn-zoom" onclick="openModal('<?= $imgSrc ?>')" title="Agrandir l'image">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                    <line x1="11" y1="8" x2="11" y2="14"></line>
+                                    <line x1="8" y1="11" x2="14" y2="11"></line>
+                                </svg>
+                            </button>
+
                         <?php else: ?>
                             <div class="spinner-box">
                                 <div class="spinner"></div>
@@ -122,7 +134,37 @@ if (isset($_POST['choose_render']) && isset($_POST['proposal_id']) && isset($_PO
 
         <?php endif; ?>
     </div>
+</div>      
+<div id="imageModal" class="modal" onclick="closeModal()">
+    <span class="close">&times;</span>
+    <img class="modal-content" id="fullImage">
 </div>
+
+<script>
+function openModal(src) {
+    const modal = document.getElementById("imageModal");
+    const modalImg = document.getElementById("fullImage");
+    
+    modal.style.display = "flex"; // Uses flex to center perfectly
+    modalImg.src = src;
+    
+    // Prevents the page from scrolling behind
+    document.body.style.overflow = "hidden";
+}
+
+function closeModal() {
+    const modal = document.getElementById("imageModal");
+    modal.style.display = "none";
+    document.body.style.overflow = "auto"; // Reactivates the scroll
+}
+
+// Close with the Esc key
+document.addEventListener('keydown', function(event) {
+    if (event.key === "Escape") {
+        closeModal();
+    }
+});
+</script>
 
 <?php include "footer.php"; ?>
 
@@ -228,21 +270,84 @@ if (isset($_POST['choose_render']) && isset($_POST['proposal_id']) && isset($_PO
         border-radius: 12px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     }
-    .spinner { width: 30px; height: 30px; border: 3px solid rgba(255, 255, 255, 0.2); border-radius: 50%; border-top-color: white; animation: spin 1s linear infinite; margin: 0 auto; }
-    .loading-card .spinner { border-color: #e2e8f0; border-top-color: var(--accent); margin-bottom: 20px; }
-    .spinner-box { text-align: center; color: white; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .card-image-box {
+        position: relative;
+    }
 
-    /* Responsive (Mobile & Tablette < 900px) */
-    @media (max-width: 900px) {
-        .results-grid {
-            /* MOBILE: We force only 1 column */
-            grid-template-columns: 1fr; 
-            gap: 20px;
-        }
+    .btn-zoom {
+        position: absolute;
+        bottom: 15px;
+        right: 15px;
+        background-color: rgba(255, 255, 255, 0.9);
+        color: var(--accent);
+        border: 1px solid #e2e8f0;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: all 0.2s ease;
+        z-index: 10;
+        opacity: 0.8;
+    }
 
-        .card-image-box {
-            height: 250px;
-        }
+    .btn-zoom:hover {
+        transform: scale(1.1);
+        background-color: white;
+        opacity: 1;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.85);
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(5px); 
+    }
+
+    .modal-content {
+        margin: auto;
+        display: block;
+        max-width: 90%;
+        max-height: 90vh;
+        border-radius: 8px;
+        box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        image-rendering: pixelated;
+        animation: zoomIn 0.3s;
+    }
+
+    .close {
+        position: absolute;
+        top: 20px;
+        right: 35px;
+        color: #f1f1f1;
+        font-size: 40px;
+        font-weight: bold;
+        transition: 0.3s;
+        cursor: pointer;
+        z-index: 10000;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: var(--accent);
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    @keyframes zoomIn {
+        from {transform:scale(0.8); opacity: 0} 
+        to {transform:scale(1); opacity: 1}
     }
 </style>
