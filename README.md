@@ -80,7 +80,7 @@ Build Img2brick_grp from the source and install dependencies:
 1.  **Clone the repository:**
 
     ```bash
-    git clone [https://github.com/Lynox789/Img2brick_grp](https://github.com/Lynox789/Img2brick_grp)
+    git clone https://github.com/Lynox789/Img2brick_grp
     ```
 
 2.  **Navigate to the project directory:**
