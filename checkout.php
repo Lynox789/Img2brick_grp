@@ -190,9 +190,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (file_exists($imagePath)) {
             $imageBinaryData = file_get_contents($imagePath);
         }
+
+        $taille = intval($proposal['resolution']); // Ex: 32, 48, 64
+        $articleId = "KIT_MOSAIQUE";
+
+        switch($taille){
+            case 32:
+                $articleId = "KIT_32";
+                break;
+            case 48:
+                $articleId = "KIT_48";
+                break;
+            case 64:
+                $articleId = "KIT_64";
+                break;
+            case 96:
+                $articleId = "KIT_96";
+                break;
+            default:
+                $articleId = "KIT_MOSAIQUE";
+                break;
+        }
         
         // Creation of the article if non-existent
-        $db->query("INSERT IGNORE INTO article (id_article, description, prix_unitaire_ht, taux_tva) VALUES ('KIT_MOSAIQUE', 'Kit Mosaïque Lego Personnalisé', 0, 20.00)");
+        $db->query("INSERT IGNORE INTO article (id_article, description, prix_unitaire_ht, taux_tva) VALUES ('$articleId', 'Kit Mosaïque Lego Personnalisé', 0, 20.00)");
 
         $idLigne = uniqid(); // Generates a unique ID (ex: 65a4f8...)
 
@@ -204,7 +225,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             snapshot_img
         ) VALUES (
             ?,                  
-            1, ?, 'KIT_MOSAIQUE', 
+            1, ?, ?, 
             ?, 1, 
             ?, 0, 
             ?
@@ -216,7 +237,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // We pass $idLigne as the first parameter
 
-        $stmtLigne->execute([$idLigne, $factureId, $descArticle, $prixHT, $imageBinaryData]);
+        $stmtLigne->execute([$idLigne, $factureId, $articleId, $descArticle, $prixHT, $imageBinaryData]);
 
         // Now that the lines are added, we can lock the invoice
         $stmtValide = $db->prepare("UPDATE facture SET etat_facture = 'VALIDEE', validation = 1 WHERE id_facture = ?");
