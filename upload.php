@@ -90,7 +90,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
             padding-top: 80px; 
         }
         .uploader { 
-            max-width: 520px; 
+            display: flex;
+            gap: 100px;
             margin: 40px auto; 
         }
     
@@ -101,14 +102,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
             justify-content: center; 
             text-align: center;      
             gap: 15px; 
-            padding: 40px 20px;      
+            padding: 100px 20px;      
             border-radius: 12px; 
             border: 2px dashed #cbd5e1; 
             background: white;
             cursor: pointer; 
             transition: all 0.2s; 
             user-select: none;
-            min-height: 200px;       
+            min-height: 300px;       
         }
         .drop-btn:hover, .drop-btn.dragover {
             border-color: var(--accent);
@@ -174,130 +175,153 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
             border: 1px solid #fecaca;
         }
 
-    .hero-section {
-        background: linear-gradient(180deg, #5aa7f5 0%, #e2e8f0 100%);
-        padding: 60px 20px;
-        text-align: center;
-        border-bottom: 1px solid #cbd5e1;
-        border-radius: 50px;
-    }
-
-    .hero-title {
-        font-size: 2.5rem;
-        color: #1e293b;
-        margin-bottom: 10px;
-        font-weight: 800;
-    }
-
-    .hero-subtitle {
-        font-size: 1.2rem;
-        color: #64748b;
-        margin-bottom: 50px;
-    }
-
-    /* Example container */
-    .comparison-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 30px;
-        max-width: 900px;
-        margin: 0 auto;
-    }
-
-    .img-wrapper {
-        position: relative;
-        flex: 1;
-        background: white;
-        padding: 10px;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        transform: rotate(-2deg); 
-        transition: transform 0.3s;
-    }
-    .img-wrapper:last-child {
-        transform: rotate(2deg); 
-    }
-    .img-wrapper:hover {
-        transform: scale(1.05) rotate(0deg); 
-        z-index: 10;
-    }
-
-    .demo-img {
-        width: 100%;
-        height: auto;
-        border-radius: 8px;
-        display: block;
-    }
-    
-    .pixelated {
-        image-rendering: pixelated;
-    }
-
-    .img-label {
-        position: absolute;
-        top: -10px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #334155;
-        color: white;
-        padding: 5px 15px;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: bold;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-
-    /* the arrow */
-    .arrow-box {
-        color: var(--accent); 
-        width: 50px;
-        height: 50px;
-        animation: bounceX 1.5s infinite;
-    }
-
-    @keyframes bounceX {
-        0%, 100% { transform: translateX(0); }
-        50% { transform: translateX(10px); }
-    }
-
-    /* The Button */
-    .btn-cta {
-        display: inline-block;
-        background: var(--accent); 
-        color: white;
-        padding: 15px 40px;
-        font-size: 1.2rem;
-        font-weight: bold;
-        border-radius: 50px;
-        text-decoration: none;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .btn-cta:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-    }
-
-    /* Responsive mobile */
-    @media (max-width: 768px) {
-        .comparison-container {
-            flex-direction: column; 
-            gap: 20px;
+        .hero-section {
+            background: linear-gradient(180deg, #5aa7f5 0%, #e2e8f0 100%);
+            padding: 60px 20px;
+            text-align: center;
+            border-bottom: 1px solid #cbd5e1;
+            border-radius: 50px;
+            max-width: 600px;
         }
 
-        .arrow-box {
-            transform: rotate(90deg); /* The arrow points down */
-            animation: bounceY 1.5s infinite; /* Vertical animation */
+        .hero-title {
+            font-size: 2.5rem;
+            color: #1e293b;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: #64748b;
+            margin-bottom: 50px;
+        }
+
+        /* Example container */
+        .comparison-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .img-wrapper {
+            position: relative;
+            flex: 1;
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transform: rotate(-2deg); 
+            transition: transform 0.3s;
+        }
+        .img-wrapper:last-child {
+            transform: rotate(2deg); 
+        }
+        .img-wrapper:hover {
+            transform: scale(1.05) rotate(0deg); 
+            z-index: 10;
+        }
+
+        .demo-img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            display: block;
         }
         
-        @keyframes bounceY {
-            0%, 100% { transform: rotate(90deg) translateY(0); }
-            50% { transform: rotate(90deg) translateY(-10px); }
+        .pixelated {
+            image-rendering: pixelated;
         }
 
-        .hero-title { font-size: 1.8rem; }
-    }
+        .img-label {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #334155;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* the arrow */
+        .arrow-box {
+            color: var(--accent); 
+            width: 50px;
+            height: 50px;
+            animation: bounceX 1.5s infinite;
+        }
+
+        @keyframes bounceX {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(10px); }
+        }
+
+        /* The Button */
+        .btn-cta {
+            display: inline-block;
+            background: var(--accent); 
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        /* Responsive mobile */
+        @media (max-width: 768px) {
+            .comparison-container {
+                flex-direction: column; 
+                gap: 20px;
+            }
+
+            .arrow-box {
+                transform: rotate(90deg); /* The arrow points down */
+                animation: bounceY 1.5s infinite; /* Vertical animation */
+            }
+            
+            @keyframes bounceY {
+                0%, 100% { transform: rotate(90deg) translateY(0); }
+                50% { transform: rotate(90deg) translateX(-10px); }
+            }
+
+            .hero-title { font-size: 1.8rem; }
+            .hero-section { 
+                padding: 40px 15px;
+                max-width: 400px;
+            }
+
+            .img-wrapper {
+                position: relative;
+                flex: 1;
+                background: white;
+                padding: 10px;
+                border-radius: 12px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+                transform: rotate(-2deg); 
+                transition: transform 0.3s;
+                max-width: 200px;
+        }
+        }
+        @media (max-width: 1140px) {
+            .uploader {
+                flex-direction: column;
+                gap: 40px;
+            }
+        }
     </style>
 </head>
 <div class="uploader">
@@ -330,14 +354,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
 
         </div>
     </section>
-    <h2><?= msg('upload_step_title') ?></h2>
     
     <?php if ($errorMessage): ?>
         <div class="message-box message-error" style="display:block;">
             <?= htmlspecialchars($errorMessage) ?>
         </div>
     <?php endif; ?>
-
+    
+    <section>
+    <h2><?= msg('upload_step_title') ?></h2>
     <form id="uploadFormElement" method="post" enctype="multipart/form-data">
         <label class="drop-btn" id="dropAreaElement">
             
@@ -360,6 +385,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
 
         <button id="submitBtn" type="submit"><?= msg('btn_continue') ?></button>
     </form>
+    </section>
+    
 </div>
 
     <?php include "footer.php"; ?>

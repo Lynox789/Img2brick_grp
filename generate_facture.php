@@ -69,7 +69,7 @@ if ($proposal) {
 class PDF extends FPDF {
     function Header() {
         // Logo
-        if(file_exists('logo.png')) $this->Image('logo.png',10,6,30);
+        if(file_exists('logo.png')) $this->Image('logo.png',6,6,20);
         
         $this->SetFont('Arial','B',15);
         $this->Cell(80);
