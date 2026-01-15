@@ -1,5 +1,6 @@
 <?php
 require "config.php";
+require_once "classes/Security.php";
 // We include your classes if they exist, otherwise we will use native to avoid crashes
 if (file_exists("classes/Security.php")) require_once "classes/Security.php";
 
@@ -421,6 +422,7 @@ include "header.php";
                     <label style="background:#eff6ff; padding:10px; border-radius:6px; margin-bottom:15px; display:block; cursor:pointer;">
                         <input type="checkbox" name="has_account" value="1" onchange="toggleAuth(this)"> <?= msg('lbl_have_account') ?>
                     </label>
+                    <div class="cf-turnstile" data-sitekey="" data-callback="unlockButton" ></div>
 
                     <div id="register-fields">
                         <div class="form-group"><label><?= msg('lbl_email') ?></label><input type="email" name="email"></div>
@@ -478,7 +480,7 @@ include "header.php";
                 </div>
             </div>
 
-            <button type="submit" class="btn-confirm"><?= msg('btn_pay_order') ?></button>
+            <button type="submit" class="btn-confirm" id="btnRegister" disabled><?= msg('btn_pay_order') ?></button>
         </form>
     </div>
 
@@ -524,5 +526,13 @@ include "header.php";
             reg.querySelectorAll('input').forEach(i => i.required = true);
             log.querySelectorAll('input').forEach(i => i.required = false);
         }
+    }
+    function unlockButton() {
+        const btn = document.getElementById('btnRegister');
+        
+        btn.disabled = false;
+        
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
     }
 </script>

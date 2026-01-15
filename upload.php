@@ -355,13 +355,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
         </div>
     </section>
     
+    
+    <section>
     <?php if ($errorMessage): ?>
         <div class="message-box message-error" style="display:block;">
             <?= htmlspecialchars($errorMessage) ?>
         </div>
     <?php endif; ?>
-    
-    <section>
     <h2><?= msg('upload_step_title') ?></h2>
     <form id="uploadFormElement" method="post" enctype="multipart/form-data">
         <label class="drop-btn" id="dropAreaElement">

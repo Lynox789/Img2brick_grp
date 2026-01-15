@@ -17,14 +17,47 @@ $proposals = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Processing the 'ORDER' Click
 if (isset($_POST['choose_render']) && isset($_POST['proposal_id']) && isset($_POST['algo_target'])) {
-    $selectedPropId = intval($_POST['proposal_id']);
-    $algoId = intval($_POST['algo_target']); 
-    $newStrategy = "ALGO_" . $algoId;
-    $upd = $db->prepare("UPDATE mosaic_proposals SET strategy = ?, total_bricks_count = 0 WHERE id = ?");
-    $upd->execute([$newStrategy, $selectedPropId]);
-    $_SESSION['final_proposal_id'] = $selectedPropId;
-    header("Location: cart.php"); 
-    exit;
+    
+    $sourcePropId = intval($_POST['proposal_id']); 
+    $algoId = intval($_POST['algo_target']);       
+    $newStrategy = "ALGO_" . $algoId;              
+
+    try {
+        $stmtSource = $db->prepare("SELECT image_id, resolution, total_bricks_count, estimated_cost, is_stock_sufficient FROM mosaic_proposals WHERE id = ?");
+        $stmtSource->execute([$sourcePropId]);
+        $sourceData = $stmtSource->fetch(PDO::FETCH_ASSOC);
+
+        if (!$sourceData) {
+            throw new Exception("Proposition source introuvable.");
+        }
+
+        // We insert a NEWLINE (copy) with the new strategy
+
+        $stmtCopy = $db->prepare("INSERT INTO mosaic_proposals (image_id, strategy, resolution, total_bricks_count, estimated_cost, is_stock_sufficient) VALUES (?, ?, ?, 0, 0.00, ?)");
+        
+        $stmtCopy->execute([
+            $sourceData['image_id'],
+            $newStrategy,
+            $sourceData['resolution'],
+            $sourceData['is_stock_sufficient']
+        ]);
+
+        $newPropId = $db->lastInsertId();
+        $oldFile = "uploads/preview_" . $sourcePropId . ".png";
+        $newFile = "uploads/preview_" . $newPropId . ".png";
+        
+        if (file_exists($oldFile)) {
+            copy($oldFile, $newFile);
+        }
+
+        $_SESSION['final_proposal_id'] = $newPropId;
+
+        header("Location: cart.php"); 
+        exit;
+
+    } catch (Exception $e) {
+        die("Erreur lors de la sélection : " . $e->getMessage());
+    }
 }
 ?>
 
