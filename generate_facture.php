@@ -26,7 +26,7 @@ if (!$facture) {
 }
 
 // Recovery of billing lines (The "Global Kit")
-$sqlLignes = "SELECT * FROM ligne_facture WHERE id_facture = ?";
+$sqlLignes = "SELECT *, snapshot_img FROM ligne_facture WHERE id_facture = ?";
 $stmtLignes = $db->prepare($sqlLignes);
 $stmtLignes->execute([$facture['id_facture']]);
 $lignesFacture = $stmtLignes->fetchAll(PDO::FETCH_ASSOC);
@@ -151,6 +151,7 @@ $pdf->Cell(30, 8, utf8_decode("Total HT"), 1, 1, 'R', true);
 // Data
 $pdf->SetFont('Arial','',10);
 $totalHT = 0;
+$tempImageFile = null; // We prepare the variable for the temp file
 
 foreach ($lignesFacture as $ligne) {
     $nomProduit = utf8_decode($ligne['designation_article_cache']);
@@ -163,9 +164,29 @@ foreach ($lignesFacture as $ligne) {
     $pdf->Cell(20, 8, $qte, 1, 0, 'C');
     $pdf->Cell(30, 8, number_format($pu, 2, ',', ' ').chr(128), 1, 0, 'R');
     $pdf->Cell(30, 8, number_format($ligneTotal, 2, ',', ' ').chr(128), 1, 1, 'R');
+
+    // adding the snapshot image if exists
+    if (!empty($ligne['snapshot_img'])) {
+        
+        $tempImageFile = sys_get_temp_dir() . '/img_facture_' . uniqid() . '.png';
+        
+        file_put_contents($tempImageFile, $ligne['snapshot_img']);
+        
+        // We save the current Y position
+        $y = $pdf->GetY();
+        
+        $pdf->SetFont('Arial', 'I', 8);
+        $pdf->Cell(190, 6, utf8_decode("Visuel archivé (Preuve d'intégrité) :"), 'LR', 1, 'L');
+        
+        $pdf->Image($tempImageFile, 20, $pdf->GetY(), 30); 
+        
+        $pdf->Cell(190, 32, "", 'LRB', 1); 
+        
+        $pdf->SetFont('Arial', '', 10);
+    }
 }
 
-// TOTALS 
+// Total
 $pdf->Ln(2);
 $tva = $totalHT * 0.20; 
 $ttc = $totalHT + $tva;
@@ -236,4 +257,9 @@ if (!empty($listeBriques)) {
 
 // Output
 $pdf->Output('I', 'Facture_'.$facture['id_facture'].'.pdf');
+
+// We delete the temporary image file from the server
+if ($tempImageFile && file_exists($tempImageFile)) {
+    unlink($tempImageFile);
+}
 ?>

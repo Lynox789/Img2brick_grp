@@ -183,6 +183,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $prixTTC = floatval($cartPrice);
         $tvaRate = 1.20; 
         $prixHT = $prixTTC / $tvaRate;
+
+        // Immunization we retrieve the binary content of the image 
+        $imagePath = "uploads/preview_" . $proposal['id'] . ".png";
+        $imageBinaryData = null;
+        if (file_exists($imagePath)) {
+            $imageBinaryData = file_get_contents($imagePath);
+        }
         
         // Creation of the article if non-existent
         $db->query("INSERT IGNORE INTO article (id_article, description, prix_unitaire_ht, taux_tva) VALUES ('KIT_MOSAIQUE', 'Kit Mosaïque Lego Personnalisé', 0, 20.00)");
@@ -193,12 +200,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             id_ligne_facture,   
             num_ligne, id_facture, id_article, 
             designation_article_cache, quantite, 
-            prix_unitaire_ht, pourcentage_remise_ligne
+            prix_unitaire_ht, pourcentage_remise_ligne,
+            snapshot_img
         ) VALUES (
             ?,                  
             1, ?, 'KIT_MOSAIQUE', 
             ?, 1, 
-            ?, 0
+            ?, 0, 
+            ?
         )";
 
         $descArticle = "Kit Mosaïque " . $proposal['resolution'] . "x" . $proposal['resolution'] . " - " . ucfirst($cartStyle);
@@ -207,7 +216,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // We pass $idLigne as the first parameter
 
-        $stmtLigne->execute([$idLigne, $factureId, $descArticle, $prixHT]);
+        $stmtLigne->execute([$idLigne, $factureId, $descArticle, $prixHT, $imageBinaryData]);
 
         // Now that the lines are added, we can lock the invoice
         $stmtValide = $db->prepare("UPDATE facture SET etat_facture = 'VALIDEE', validation = 1 WHERE id_facture = ?");

@@ -15,10 +15,10 @@ $stmt = $db->prepare("SELECT * FROM mosaic_proposals WHERE image_id = ? AND stra
 $stmt->execute([$imgId]);
 $proposals = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// 2. Processing the 'ORDER' Click
+// Processing the 'ORDER' Click
 if (isset($_POST['choose_render']) && isset($_POST['proposal_id']) && isset($_POST['algo_target'])) {
     $selectedPropId = intval($_POST['proposal_id']);
-    $algoId = intval($_POST['algo_target']); // The ID of the algorithm C (3, 4 or 5)
+    $algoId = intval($_POST['algo_target']); 
     $newStrategy = "ALGO_" . $algoId;
     $upd = $db->prepare("UPDATE mosaic_proposals SET strategy = ?, total_bricks_count = 0 WHERE id = ?");
     $upd->execute([$newStrategy, $selectedPropId]);
@@ -30,20 +30,20 @@ if (isset($_POST['choose_render']) && isset($_POST['proposal_id']) && isset($_PO
 
 <?php include "header.php"; ?>
 
-<div class="container" style="max-width: 95%; margin: 0 auto; padding: 40px 20px;">
+<div class="results-container">
 
-    <div style="text-align:center; margin-bottom:40px;">
-        <h2 style="color: var(--text); margin-bottom:10px;"><?= msg('results_title') ?></h2>
-        <p style="color: #64748b;"><?= msg('results_subtitle') ?></p>
+    <div class="results-header">
+        <h2><?= msg('results_title') ?></h2>
+        <p><?= msg('results_subtitle') ?></p>
     </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+    <div class="results-grid">
 
         <?php if (empty($proposals)): ?>
-            <div style="grid-column: 1/-1; text-align: center; padding: 60px; background:white; border-radius:12px; box-shadow:0 4px 6px rgba(0,0,0,0.05);">
-                <div class="spinner" style="margin:0 auto 20px; border-top-color:var(--accent);"></div>
-                <h3 style="color:var(--text);"><?= msg('generating_variants_title') ?></h3>
-                <p style="color:#64748b;"><?= msg('generating_variants_desc') ?></p>
+            <div class="loading-card">
+                <div class="spinner"></div>
+                <h3><?= msg('generating_variants_title') ?></h3>
+                <p><?= msg('generating_variants_desc') ?></p>
                 <script>setTimeout(() => window.location.reload(), 3000);</script>
             </div>
         <?php else: ?>
@@ -82,49 +82,39 @@ if (isset($_POST['choose_render']) && isset($_POST['proposal_id']) && isset($_PO
                 }
                 ?>
 
-                <div class="card" style="background: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; display: flex; flex-direction: column;">
-
-                    <div style="padding: 15px; text-align: center; border-bottom: 1px solid #f1f5f9; background:#f8fafc;">
-                        <h3 style="margin:0; color: var(--accent); font-size:1.2rem;"><?= $title ?></h3>
+                <div class="card result-card">
+                    <div class="card-header">
+                        <h3><?= $title ?></h3>
                     </div>
 
-                    <div style="background: #0f172a; padding: 20px; display: flex; align-items: center; justify-content: center; height: 350px;">
+                    <div class="card-image-box">
                         <?php if ($isReady): ?>
-                            
                             <img src="render_lego.php?id=<?= $p['id'] ?>&t=<?= time() ?>" 
-                                alt="<?= $title ?>"
-                                style="
-                                    width: 100%;
-                                    height: 100%;
-                                    object-fit: contain;
-                                    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
-                                ">
-
+                                 alt="<?= $title ?>"
+                                 class="preview-img">
                         <?php else: ?>
-                            <div style="color:white; text-align:center;">
-                                <div class="spinner" style="border-top-color:white; margin-bottom:10px;"></div>
+                            <div class="spinner-box">
+                                <div class="spinner"></div>
                                 <small><?= msg('card_loading_text') ?></small>
                             </div>
-                            <script>
-                                setTimeout(() => window.location.reload(), 2000);
-                            </script>
+                            <script>setTimeout(() => window.location.reload(), 2000);</script>
                         <?php endif; ?>
                     </div>
 
-                    <div style="padding: 20px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
-                        <p style="text-align:center; font-size:0.9rem; color:#64748b; margin-bottom: 20px;">
+                    <div class="card-body">
+                        <p class="card-desc">
                             <?= $desc ?>
                         </p>
                         <?php if ($isReady): ?>
                             <form method="post">
                                 <input type="hidden" name="proposal_id" value="<?= $p['id'] ?>">
                                 <input type="hidden" name="algo_target" value="<?= $algoTarget ?>">
-                                <button type="submit" name="choose_render" class="btn-primary" style="width: 100%; padding:12px; font-size:1rem;">
+                                <button type="submit" name="choose_render" class="btn-primary">
                                     <?= msg('btn_choose_style') ?>
                                 </button>
                             </form>
                         <?php else: ?>
-                            <button disabled style="...">...</button>
+                            <button disabled class="btn-disabled">...</button>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -137,57 +127,122 @@ if (isset($_POST['choose_render']) && isset($_POST['proposal_id']) && isset($_PO
 <?php include "footer.php"; ?>
 
 <style>
-    .spinner {
-        width: 30px; height: 30px; border: 3px solid rgba(0, 0, 0, 0.1); border-radius: 50%;
-        border-top-color: var(--accent); animation: spin 1s linear infinite; margin: 0 auto;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .card { transition: transform 0.2s; border: 1px solid #e2e8f0; }
-    .card:hover { transform: translateY(-5px); border-color: var(--accent); }
-
-    .mosaic-wrapper {
-        position: relative;
-        height: 100%;
-        width: auto;
-        max-width: 100%;
-        /* Shadow under the global plate */
-        box-shadow: 0 10px 25px rgba(0,0,0,0.4); 
+    .results-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
     }
 
-    .mosaic-wrapper img {
+    .results-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    .results-header h2 { color: var(--text); margin-bottom: 10px; font-size: 2rem; }
+    .results-header p { color: #64748b; }
+
+    .results-grid {
+        display: grid;
+        /* on PC: We force 3 strict columns */
+        grid-template-columns: 1fr 1fr 1fr; 
+        gap: 30px;
+    }
+
+    .result-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #e2e8f0;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .result-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        border-color: var(--accent);
+    }
+
+    .card-header {
+        padding: 15px;
+        text-align: center;
+        border-bottom: 1px solid #f1f5f9;
+        background: #f8fafc;
+    }
+    .card-header h3 { margin: 0; color: var(--accent); font-size: 1.2rem; }
+
+    .card-image-box {
+        background: #0f172a;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 300px; 
+    }
+
+    .preview-img {
         width: 100%;
         height: 100%;
-        display: block;
-        object-fit: fill;
-        
-        /* Essential to keep pixels square and sharp */
+        object-fit: contain;
+        filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
         image-rendering: pixelated; 
-        image-rendering: -moz-crisp-edges;
-        image-rendering: crisp-edges;
     }
 
-    .grid-overlay {
-        position: absolute;
-        top: 0; left: 0; width: 100%; height: 100%;
-        pointer-events: none;
-        background-image: 
-            radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 15%),
-            radial-gradient(circle at 50% 50%, 
-                transparent 56%,          
-                rgba(0, 0, 0, 0.15) 57%,
-                rgba(0, 0, 0, 0.5) 63%,  
-                transparent 65%     
-            ),
+    .card-body {
+        padding: 20px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
 
-            radial-gradient(circle at 50% 50%, 
-                transparent 56%, 
-                rgba(0, 0, 0, 0.1) 57%
-            ),
-            linear-gradient(to right, rgba(0, 0, 0, 0.15) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(0, 0, 0, 0.15) 1px, transparent 1px);
-        
-        background-size: calc(100% / var(--grid-x)) calc(100% / var(--grid-y));
-        
-        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+    .card-desc {
+        text-align: center;
+        font-size: 0.9rem;
+        color: #64748b;
+        margin-bottom: 20px;
+    }
+
+    /* Buttons */
+    .btn-primary {
+        width: 100%;
+        padding: 12px;
+        font-size: 1rem;
+        background: var(--accent);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: opacity 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-disabled { width: 100%; padding: 12px; background: #cbd5e1; border: none; border-radius: 8px; cursor: not-allowed; color: white; }
+
+    /* Loading States */
+    .loading-card {
+        grid-column: 1 / -1; 
+        text-align: center;
+        padding: 60px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    .spinner { width: 30px; height: 30px; border: 3px solid rgba(255, 255, 255, 0.2); border-radius: 50%; border-top-color: white; animation: spin 1s linear infinite; margin: 0 auto; }
+    .loading-card .spinner { border-color: #e2e8f0; border-top-color: var(--accent); margin-bottom: 20px; }
+    .spinner-box { text-align: center; color: white; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Responsive (Mobile & Tablette < 900px) */
+    @media (max-width: 900px) {
+        .results-grid {
+            /* MOBILE: We force only 1 column */
+            grid-template-columns: 1fr; 
+            gap: 20px;
+        }
+
+        .card-image-box {
+            height: 250px;
+        }
     }
 </style>
