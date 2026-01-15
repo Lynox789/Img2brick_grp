@@ -335,7 +335,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
             <div class="comparison-container">
                 
                 <div class="img-wrapper">
-                    <span class="img-label">Original</span>
+                    <span class="img-label"><?= msg('label_original') ?></span>
                     <img src="demo_original.png" alt="Original" class="demo-img"> 
                 </div>
 
@@ -346,7 +346,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
                 </div>
 
                 <div class="img-wrapper">
-                    <span class="img-label" style="background:var(--accent);">Mosaïque</span>
+                    <span class="img-label" style="background:var(--accent);"><?= msg('label_mosaic') ?></span>
                     <img src="demo_lego.png" alt="Lego" class="demo-img pixelated">
                 </div>
 

@@ -217,6 +217,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             max-height: 60vh;
         }
     }
+
+    .btn-cancel {
+        display: block;
+        width: 100%; 
+        text-align: center;
+        margin-top: 15px;
+        padding: 12px;
+        
+        color: #64748b; 
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        
+        border-radius: 8px;
+        background-color: #fee2e2;
+        border: 1px solid transparent; 
+        
+        transition: all 0.2s ease;
+    }
+
+    .btn-cancel:hover {
+        color: #ef4444;       
+        background-color: #fee2e2; 
+        border-color: #fca5a5;    
+        cursor: pointer;
+    }
 </style>
 
 <div id="loading">
@@ -242,7 +268,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <div class="actions">
             <button id="btnGenerate" class="btn-primary"><?= msg('btn_generate') ?></button>
-            <a href="upload.php" style="display:block; text-align:center; margin-top:15px; color:#64748b;"><?= msg('link_cancel') ?></a>
+            <a href="upload.php" class="btn-cancel"><?= msg('link_cancel') ?></a>        
         </div>
     </div>
 </div>
