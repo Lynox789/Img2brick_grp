@@ -179,29 +179,37 @@ document.addEventListener('keydown', function(event) {
         text-align: center;
         margin-bottom: 40px;
     }
-    .results-header h2 { color: var(--text); margin-bottom: 10px; font-size: 2rem; }
-    .results-header p { color: #64748b; }
+
+    .results-header h2 {
+        color: var(--text);
+        margin-bottom: 10px;
+        font-size: 2rem;
+    }
+
+    .results-header p {
+        color: #64748b;
+    }
 
     .results-grid {
         display: grid;
-        /* on PC: We force 3 strict columns */
-        grid-template-columns: 1fr 1fr 1fr; 
+        grid-template-columns: 1fr 1fr 1fr;
         gap: 30px;
     }
 
     .result-card {
         background: white;
         border-radius: 16px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
         overflow: hidden;
         display: flex;
         flex-direction: column;
         border: 1px solid #e2e8f0;
         transition: transform 0.2s, box-shadow 0.2s;
     }
+
     .result-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
         border-color: var(--accent);
     }
 
@@ -211,7 +219,12 @@ document.addEventListener('keydown', function(event) {
         border-bottom: 1px solid #f1f5f9;
         background: #f8fafc;
     }
-    .card-header h3 { margin: 0; color: var(--accent); font-size: 1.2rem; }
+
+    .card-header h3 {
+        margin: 0;
+        color: var(--accent);
+        font-size: 1.2rem;
+    }
 
     .card-image-box {
         background: #0f172a;
@@ -219,15 +232,43 @@ document.addEventListener('keydown', function(event) {
         display: flex;
         align-items: center;
         justify-content: center;
-        height: 300px; 
+        height: 300px;
+        position: relative;
     }
 
     .preview-img {
         width: 100%;
         height: 100%;
         object-fit: contain;
-        filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
-        image-rendering: pixelated; 
+        filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+        image-rendering: pixelated;
+    }
+
+    .btn-zoom {
+        position: absolute;
+        bottom: 15px;
+        right: 15px;
+        background-color: rgba(255, 255, 255, 0.9);
+        color: #333;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        transition: all 0.2s ease;
+        z-index: 10;
+        opacity: 0.7;
+    }
+
+    .btn-zoom:hover {
+        transform: scale(1.1);
+        background-color: white;
+        opacity: 1;
+        color: var(--accent);
     }
 
     .card-body {
@@ -258,62 +299,68 @@ document.addEventListener('keydown', function(event) {
         font-weight: 600;
         transition: opacity 0.2s;
     }
-    .btn-primary:hover { opacity: 0.9; }
-    .btn-disabled { width: 100%; padding: 12px; background: #cbd5e1; border: none; border-radius: 8px; cursor: not-allowed; color: white; }
 
-    /* Loading States */
+    .btn-primary:hover {
+        opacity: 0.9;
+    }
+
+    .btn-disabled {
+        width: 100%;
+        padding: 12px;
+        background: #cbd5e1;
+        border: none;
+        border-radius: 8px;
+        cursor: not-allowed;
+        color: white;
+    }
+
     .loading-card {
-        grid-column: 1 / -1; 
+        grid-column: 1 / -1;
         text-align: center;
         padding: 60px;
         background: white;
         border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    }
-    .card-image-box {
-        position: relative;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     }
 
-    .btn-zoom {
-        position: absolute;
-        bottom: 15px;
-        right: 15px;
-        background-color: rgba(255, 255, 255, 0.9);
-        color: var(--accent);
-        border: 1px solid #e2e8f0;
+    .spinner-box {
+        text-align: center;
+        color: white;
+    }
+
+    .spinner {
+        width: 30px;
+        height: 30px;
+        border: 3px solid rgba(255, 255, 255, 0.2);
         border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        transition: all 0.2s ease;
-        z-index: 10;
-        opacity: 0.8;
+        border-top-color: white;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
     }
 
-    .btn-zoom:hover {
-        transform: scale(1.1);
-        background-color: white;
-        opacity: 1;
-        box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    .loading-card .spinner {
+        border-color: #e2e8f0;
+        border-top-color: var(--accent);
+        margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
     }
 
     .modal {
         display: none;
         position: fixed;
-        z-index: 9999;
+        z-index: 1000;
         left: 0;
         top: 0;
         width: 100%;
         height: 100%;
         overflow: auto;
-        background-color: rgba(0, 0, 0, 0.85);
+        background-color: rgba(0, 0, 0, 0.9);
         align-items: center;
         justify-content: center;
-        backdrop-filter: blur(5px); 
+        backdrop-filter: blur(5px);
     }
 
     .modal-content {
@@ -321,10 +368,15 @@ document.addEventListener('keydown', function(event) {
         display: block;
         max-width: 90%;
         max-height: 90vh;
-        border-radius: 8px;
-        box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        border-radius: 5px;
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
         image-rendering: pixelated;
-        animation: zoomIn 0.3s;
+        animation: zoomAnim 0.3s;
+    }
+
+    @keyframes zoomAnim {
+        from { transform: scale(0.8); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
     }
 
     .close {
@@ -341,13 +393,19 @@ document.addEventListener('keydown', function(event) {
 
     .close:hover,
     .close:focus {
-        color: var(--accent);
+        color: #bbb;
         text-decoration: none;
         cursor: pointer;
     }
 
-    @keyframes zoomIn {
-        from {transform:scale(0.8); opacity: 0} 
-        to {transform:scale(1); opacity: 1}
+    @media (max-width: 900px) {
+        .results-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .card-image-box {
+            height: 250px;
+        }
     }
 </style>
