@@ -265,38 +265,8 @@ if (isset($_POST['login'])) {
                 <div class="title-text"><?= msg('title_register') ?></div>
                 <form method="post" action="#">
                     
-                    <div class="row-group">
-                        <div class="field">
-                            <input type="text" name="firstname" placeholder="<?= msg('placeholder_firstname') ?>" required>
-                        </div>
-                        <div class="field">
-                            <input type="text" name="lastname" placeholder="<?= msg('placeholder_lastname') ?>" required>
-                        </div>
-                    </div>
-
                     <div class="field">
                         <input type="email" name="email" placeholder="<?= msg('placeholder_email') ?>" required>
-                    </div>
-
-                    <div class="field">
-                        <input type="tel" name="phone" placeholder="<?= msg('placeholder_phone') ?>" required>
-                    </div>
-
-                    <div class="field">
-                        <input type="text" name="address" placeholder="<?= msg('placeholder_address') ?>" required>
-                    </div>
-
-                    <div class="row-group">
-                        <div class="field">
-                            <input type="text" name="zipcode" placeholder="<?= msg('placeholder_zipcode') ?>" required>
-                        </div>
-                        <div class="field">
-                            <input type="text" name="city" placeholder="<?= msg('placeholder_city') ?>" required>
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <input type="text" name="country" placeholder="<?= msg('placeholder_country') ?>" required>
                     </div>
 
                     <div class="row-group">

@@ -107,9 +107,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
             border: 2px dashed #cbd5e1; 
             background: white;
             cursor: pointer; 
-            transition: all 0.2s; 
+            transition: border-color 0.2s, background 0.2s;
             user-select: none;
             min-height: 300px;       
+            box-sizing: border-box;
         }
         .drop-btn:hover, .drop-btn.dragover {
             border-color: var(--accent);
@@ -139,6 +140,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
             color: #64748b; 
             margin-top: 4px; 
         }
+
+        /* Preview zone */
+        .preview-zone {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            min-height: 300px;
+        }
+        .preview-zone.show { display: flex; }
+
+        .preview-zone img {
+            max-height: 260px;
+            max-width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            object-fit: contain;
+        }
+
+        .change-btn {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 9px 20px;
+            border-radius: 8px;
+            border: 1.5px solid #cbd5e1;
+            background: white;
+            color: #475569;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s, background 0.2s;
+        }
+        .change-btn:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+            background: #eff6ff;
+        }
+        .change-btn svg { width: 15px; height: 15px; }
+
+        .ib-footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 16px;
+        }
+
+        .ib-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .ib-btn:hover { background: #2563eb; }
+        
+
         
         button[type="submit"] {
             background: var(--accent); 
@@ -378,15 +441,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
 
         <div id="jsMessageContainer" class="message-box"></div>
 
-        <div id="previewAreaElement" style="display:none; margin-top:15px; text-align:center;">
-            <img id="previewImageElement" style="max-height:150px; border-radius:8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-            <div id="fileNameElement" style="margin-top:5px; font-size:0.9em; color:#64748b;"></div>
+        <!-- Aperçu après upload -->
+        <div class="preview-zone" id="previewAreaElement">
+        <img id="previewImgElement" src="" alt="aperçu">
+        <button class="change-btn" id="changeBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            Changer de photo
+        </button>
         </div>
 
         <button id="submitBtn" type="submit"><?= msg('btn_continue') ?></button>
     </form>
     </section>
-    
 </div>
 
     <?php include "footer.php"; ?>
@@ -395,10 +465,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
     const dropAreaElement = document.getElementById('dropAreaElement');
     const fileInputElement = document.getElementById('fileInputElement');
     const previewAreaElement = document.getElementById('previewAreaElement');
-    const previewImageElement = document.getElementById('previewImageElement');
-    const fileNameElement = document.getElementById('fileNameElement');
+    const previewImageElement = document.getElementById('previewImgElement');
     const messageContainer = document.getElementById('jsMessageContainer');
     const submitBtn = document.getElementById('submitBtn');
+    const changeBtn = document.getElementById('changeBtn');
+
 
     // Constants must match PHP configuration
     const MAX_SIZE = 2 * 1024 * 1024; // 2MB
@@ -446,6 +517,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
     });
 
     // Main validation and preview logic
+// En dehors de handleFileSelection, avec vos autres listeners
+document.getElementById('changeBtn').addEventListener('click', () => {
+    dropAreaElement.style.display = '';
+    previewAreaElement.style.display = 'none';
+    fileInputElement.value = '';
+    fileInputElement.click();
+});
+
     function handleFileSelection(file) {
         // Reset interface state
         messageContainer.style.display = 'none';
@@ -467,13 +546,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
             return;
         }
 
-        // Generate preview URL and show success state
-        previewImageElement.src = URL.createObjectURL(file);
-        fileNameElement.textContent = file.name;
-        previewAreaElement.style.display = 'block';
-        
-        // Utilisation du message sécurisé défini plus haut
-        showMessage(messages.success, 'success');
+        previewImageElement.src = URL.createObjectURL(file); // ← harmonisez l'ID ici
+        dropAreaElement.style.display = 'none';
+        previewAreaElement.style.display = 'flex';
         submitBtn.style.display = 'block';
     }
 
