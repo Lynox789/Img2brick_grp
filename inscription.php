@@ -251,7 +251,7 @@ if (isset($_POST['login'])) {
                         <a href="forgot_password.php"><?= msg('link_forgot_pass') ?></a>
                     </div>
 
-                    <div class="cf-turnstile" data-sitekey="" data-callback="onCaptchaSuccessLog"></div>
+                    <div class="cf-turnstile" data-sitekey="<?= htmlspecialchars($_ENV['TURNSTILE_SITEKEY'] ?? '') ?>" data-callback="onCaptchaSuccessLog"></div>
                     
                     <button type="submit" name="login" id="btn-log" disabled><?= msg('btn_login') ?></button>
                     
@@ -278,7 +278,7 @@ if (isset($_POST['login'])) {
                         </div>
                     </div>
 
-                    <div class="cf-turnstile" data-sitekey="" data-callback="onCaptchaSuccessReg"></div>
+                    <div class="cf-turnstile" data-sitekey="<?= htmlspecialchars($_ENV['TURNSTILE_SITEKEY'] ?? '') ?>" data-callback="onCaptchaSuccessReg"></div>
                     
                     <button type="submit" name="register" id="btn-reg" disabled><?= msg('btn_register') ?></button>
                     

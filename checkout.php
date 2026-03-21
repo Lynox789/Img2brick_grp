@@ -421,12 +421,12 @@ include "header.php";
                     <div style="background:#dcfce7; padding:10px; border-radius:6px; color:#166534;">
                         <?= msg('status_connected') ?>
                     </div>
-                    <div class="cf-turnstile" data-sitekey="" data-callback="unlockButton" ></div>
+                    <div class="cf-turnstile" data-sitekey="<?= htmlspecialchars($_ENV['TURNSTILE_SITEKEY'] ?? '') ?>" data-callback="unlockButton" ></div>
                 <?php else: ?>
                     <label style="background:#eff6ff; padding:10px; border-radius:6px; margin-bottom:15px; display:block; cursor:pointer;">
                         <input type="checkbox" name="has_account" value="1" onchange="toggleAuth(this)"> <?= msg('lbl_have_account') ?>
                     </label>
-                    <div class="cf-turnstile" data-sitekey="" data-callback="unlockButton" ></div>
+                    <div class="cf-turnstile" data-sitekey="<?= htmlspecialchars($_ENV['TURNSTILE_SITEKEY'] ?? '') ?>" data-callback="unlockButton" ></div>
 
                     <div id="register-fields">
                         <div class="form-group"><label><?= msg('lbl_email') ?></label><input type="email" name="email"></div>

@@ -1,15 +1,12 @@
 <?php
 class Security {
-    private const TURNSTILE_SECRET = '';
-    private const ENCRYPTION_KEY = ''; 
-    private const CIPHER_METHOD = 'AES-256-CBC';
 
     // Verify Cloudflare Turnstile
     public static function verifyCaptcha($token) {
         if (empty($token)) return false;
 
         $data = [
-            'secret'   => self::TURNSTILE_SECRET,
+            'secret'   => $_ENV['TURNSTILE_SECRET'] ?? '',
             'response' => $token,
             'remoteip' => $_SERVER['REMOTE_ADDR']
         ];
@@ -37,22 +34,30 @@ class Security {
         $regex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{12,}$/';
         return preg_match($regex, $password);
     }
+    
     // Function to encrypt data
     public static function encrypt($data) {
-        $ivLength = openssl_cipher_iv_length(self::CIPHER_METHOD);
+        $cipherMethod = $_ENV['CIPHER_METHOD'] ?? '';
+        $encryptionKey = $_ENV['ENCRYPTION_KEY'] ?? '';
+
+        $ivLength = openssl_cipher_iv_length($cipherMethod);
         $iv = openssl_random_pseudo_bytes($ivLength);
         
-        $encrypted = openssl_encrypt($data, self::CIPHER_METHOD, self::ENCRYPTION_KEY, 0, $iv);
+        $encrypted = openssl_encrypt($data, $cipherMethod, $encryptionKey, 0, $iv);
         
         return base64_encode($encrypted . '::' . $iv);
     }
+    
     // Function to decrypt the data
     public static function decrypt($data) {
+        $cipherMethod = $_ENV['CIPHER_METHOD'] ?? '';
+        $encryptionKey = $_ENV['ENCRYPTION_KEY'] ?? '';
+
         $decoded = base64_decode($data);
         if (strpos($decoded, '::') === false) return $data;
 
         list($encrypted_data, $iv) = explode('::', $decoded, 2);
-        return openssl_decrypt($encrypted_data, self::CIPHER_METHOD, self::ENCRYPTION_KEY, 0, $iv);
+        return openssl_decrypt($encrypted_data, $cipherMethod, $encryptionKey, 0, $iv);
     }
 }
 ?>
