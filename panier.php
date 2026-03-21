@@ -122,8 +122,8 @@ include "header.php";
                     $orderRef = 'CMD-' . $date->format('Y') . '-' . str_pad($order['id'], 5, '0', STR_PAD_LEFT);
                     $dateFormat = ($lang == 'en') ? 'Y/m/d H:i' : 'd/m/Y à H:i';
 
-                    $addressDisplay = htmlspecialchars($order['delivery_address']);
-                    $phoneDisplay = htmlspecialchars($order['delivery_phone']);
+                    $addressDisplay = Security::decrypt($order['delivery_address']);
+                    $phoneDisplay = Security::decrypt($order['delivery_phone']);
                 ?>
 
                 <div class="order-card">

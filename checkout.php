@@ -114,8 +114,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // MOCK PAYMENT MANAGEMENT
         // We build the complete address
-        $fullAddress = $_POST['address'] . ", " . $_POST['zipcode'] . " " . $_POST['city'] . ", " . $_POST['country'];
-        $phone = $_POST['phone'];
+        $fullAddress = Security::encrypt($_POST['address'] . ", " . $_POST['zipcode'] . " " . $_POST['city'] . ", " . $_POST['country']);
+        $phone = Security::encrypt($_POST['phone']);
 
         $sqlOrder = "INSERT INTO commandes (user_id, image_id, final_image_path, selected_style, total_price, statut, date_commande, delivery_address, delivery_phone) VALUES (?, ?, ?, ?, ?, 'payée', NOW(), ?, ?)";
         $stmtOrder = $db->prepare($sqlOrder);
