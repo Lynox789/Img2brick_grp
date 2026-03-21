@@ -224,7 +224,7 @@ if (session_status() === PHP_SESSION_NONE) {
 <body>
 
 <header>
-    <a href="upload.php" class="brand">
+    <a href="index.php" class="brand">
         Img2brick
     </a>
 
@@ -237,7 +237,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <div class="nav-right" id="navMenu">
         <div class="nav-links">
             <?php if (isset($_SESSION['user_id'])): ?>
-                <a href="upload.php"><?= msg('nav_create') ?></a>
+                <a href="index.php"><?= msg('nav_create') ?></a>
                 <span class="separator">|</span>
                 <a href="account.php"><?= msg('nav_account') ?></a>
                 <span class="separator">|</span>
@@ -245,7 +245,7 @@ if (session_status() === PHP_SESSION_NONE) {
                 <span class="separator">|</span>
                 <a href="deconnexion.php" style="color:#ef4444;"><?= msg('nav_logout') ?></a>
             <?php else: ?>
-                <a href="upload.php"><?= msg('nav_home') ?></a>
+                <a href="index.php"><?= msg('nav_home') ?></a>
                 <span class="separator">|</span>
                 <a href="inscription.php"><?= msg('nav_login_signup') ?></a>
             <?php endif; ?>

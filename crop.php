@@ -3,7 +3,7 @@ require "config.php";
 
 // 1. Security Session
 if (!isset($_SESSION['temp_image_data'])) {
-    header("Location: upload.php");
+    header("Location: index.php");
     exit;
 }
 
@@ -268,7 +268,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <div class="actions">
             <button id="btnGenerate" class="btn-primary"><?= msg('btn_generate') ?></button>
-            <a href="upload.php" class="btn-cancel"><?= msg('link_cancel') ?></a>        
+            <a href="index.php" class="btn-cancel"><?= msg('link_cancel') ?></a>        
         </div>
     </div>
 </div>

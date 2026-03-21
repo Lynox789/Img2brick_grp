@@ -8,7 +8,7 @@ if (session_status() === PHP_SESSION_NONE) session_start();
 
 // CONTROL CHECK
 if (!isset($_SESSION['final_proposal_id'])) {
-    header("Location: upload.php");
+    header("Location: index.php");
     exit;
 }
 
@@ -22,7 +22,7 @@ $proposal = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$proposal) {
     error_log("Erreur Checkout: Proposition #$propId introuvable en BDD.");
-    header("Location: upload.php"); // Return to square one
+    header("Location: index.php"); // Return to square one
     exit;
 }
 
@@ -40,7 +40,7 @@ if (empty($imageId)) {
     error_log("Erreur Critique Checkout: image_id NULL pour la proposition #$propId");
     
     // We politely redirect the user to the upload without displaying technical details
-    header("Location: upload.php");
+    header("Location: index.php");
     exit;
 }
 

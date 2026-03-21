@@ -5,7 +5,7 @@ if (session_status() === PHP_SESSION_NONE) session_start();
 
 // Redirection si non connecté
 if (!isset($_SESSION['user_id'])) {
-    header("Location: upload.php"); // Ou login.php
+    header("Location: index.php"); // Ou login.php
     exit;
 }
 
@@ -99,7 +99,7 @@ include "header.php";
             <h1><?= msg('dashboard_title') ?></h1>
             <p><?= msg('dashboard_subtitle') ?></p>
         </div>
-        <a href="upload.php" class="btn-new-order"><?= msg('btn_new_creation') ?></a>
+        <a href="index.php" class="btn-new-order"><?= msg('btn_new_creation') ?></a>
     </div>
 
     <div class="orders-grid">
@@ -107,7 +107,7 @@ include "header.php";
         <?php if (empty($orders)): ?>
             <div style="grid-column: 1/-1; text-align: center; padding: 50px; background: white; border-radius: 12px; color: #64748b;">
                 <p><?= msg('empty_orders_msg') ?></p>
-                <a href="upload.php" style="color: var(--primary); font-weight:bold;"><?= msg('link_start_mosaic') ?></a>
+                <a href="index.php" style="color: var(--primary); font-weight:bold;"><?= msg('link_start_mosaic') ?></a>
             </div>
         <?php else: ?>
             

@@ -117,7 +117,7 @@
             <h3><?= msg('footer_nav_title') ?></h3>
             <ul class="footer-links">
                 <li><a href="index.php"><?= msg('nav_home') ?></a></li>
-                <li><a href="upload.php"><?= msg('nav_create_mosaic') ?></a></li>
+                <li><a href="index.php"><?= msg('nav_create_mosaic') ?></a></li>
                 <?php if(isset($_SESSION['user_id'])): ?>
                     <li><a href="panier.php"><?= msg('nav_my_orders') ?></a></li>
                     <li><a href="logout.php"><?= msg('nav_logout') ?></a></li>

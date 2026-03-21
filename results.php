@@ -3,7 +3,7 @@ require "config.php";
 
 // Security: Direct access prohibited without prior upload
 if (!isset($_SESSION['current_image_id'])) {
-    header("Location: upload.php");
+    header("Location: index.php");
     exit;
 }
 

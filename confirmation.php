@@ -17,7 +17,7 @@ include "header.php";
     </p>
 
     <div style="margin-top: 40px; display: flex; gap: 15px; justify-content: center;">
-        <a href="upload.php" style="text-decoration: none; background: var(--accent); color: white; padding: 12px 25px; border-radius: 8px; font-weight: 500;">
+        <a href="index.php" style="text-decoration: none; background: var(--accent); color: white; padding: 12px 25px; border-radius: 8px; font-weight: 500;">
             <?= msg('conf_btn_new') ?>
         </a>
         <a href="panier.php" style="text-decoration: none; background: #f1f5f9; color: #475569; padding: 12px 25px; border-radius: 8px; font-weight: 500;">

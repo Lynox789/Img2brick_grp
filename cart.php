@@ -6,7 +6,7 @@ if (session_status() === PHP_SESSION_NONE) session_start();
 
 if (!isset($_SESSION['final_proposal_id'])) {
     // If we arrive here without going through results.php, return to the upload
-    header("Location: upload.php");
+    header("Location: index.php");
     exit;
 }
 
@@ -44,7 +44,7 @@ $price = $proposal['estimated_cost'] > 0 ? $proposal['estimated_cost'] : ($propo
         <div class="alert error" style="background:#fee2e2; color:#991b1b; padding:20px; border-radius:8px; text-align:center;">
             <h3><?= msg('cart_error_title') ?></h3>
             <p><?= msg('cart_error_desc') ?></p>
-            <a href="upload.php" class="btn"><?= msg('btn_restart') ?></a>
+            <a href="index.php" class="btn"><?= msg('btn_restart') ?></a>
         </div>
 
     <?php elseif (!$isReady): ?>

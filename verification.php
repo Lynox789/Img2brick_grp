@@ -37,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: cart.php");
             exit;
         }
-        header("Location: upload.php"); 
+        header("Location: index.php"); 
         exit;
     } else {
         $message = msg('verif_error_code');
