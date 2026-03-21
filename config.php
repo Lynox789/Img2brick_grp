@@ -8,7 +8,7 @@ require_once 'classes/Logger.php';
 
 // use for sending email when password is forgotten
 // set your URL of your site next to BASE_URL
-define('BASE_URL', '');
+define('BASE_URL', $_ENV['BASE_URL'] ?? '');
 
 $db = Database::getInstance()->getConnection();
 $userMgr = new UserManager($db);
@@ -41,4 +41,41 @@ if (!function_exists('msg')) {
         return htmlspecialchars($textes[$key] ?? "[{$key}]");
     }
 }
+
+if (!function_exists('chargerEnv')){
+    function chargerEnv($chemin_fichier) {
+        // Verify if the file exist
+        if (!file_exists($chemin_fichier)) {
+            return false;
+        }
+
+        // Read line by line
+        $lignes = file($chemin_fichier, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        
+        foreach ($lignes as $ligne) {
+            $ligne = trim($ligne);
+            
+            // Ignore the non-code line
+            if (strpos($ligne, '#') === 0) {
+                continue;
+            }
+
+            // trim value and name for variables
+            if (strpos($ligne, '=') !== false) {
+                list($nom, $valeur) = explode('=', $ligne, 2);
+                $nom = trim($nom);
+                // Erase space en double quote if there is some
+                $valeur = trim($valeur, " \t\n\r\0\x0B\"'"); 
+                
+                // globale variable creation
+                $_ENV[$nom] = $valeur;
+            }
+        }
+    }
+}
+// launch new method if not set 
+if(!isset($_ENV['TURNSTILE_SECRET'])){
+    chargerEnv(__DIR__ . '/.env');    
+}
+
 ?>

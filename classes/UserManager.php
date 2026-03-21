@@ -149,10 +149,10 @@ class UserManager {
         $mail = new PHPMailer(true);
         try {
             $mail->isSMTP();
-            $mail->Host       = '';
+            $mail->Host       = $_ENV['MAIL_HOST'] ?? '';
             $mail->SMTPAuth   = true;
-            $mail->Username   = '';
-            $mail->Password   = ''; 
+            $mail->Username   = $_ENV['MAIL_USERNAME'] ?? '';
+            $mail->Password   = $_ENV['MAIL_PASSWORD'] ?? ''; 
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port       = "587";
             $mail->CharSet    = 'UTF-8';
@@ -163,7 +163,7 @@ class UserManager {
                     'allow_self_signed' => true
                 )
             );
-            $mail->setFrom('', 'Img2Brick');
+            $mail->setFrom($_ENV['MAIL_FROM'] ?? '', 'Img2Brick');
             $mail->addAddress($to);
             $mail->isHTML(true);
             $mail->Subject = $subject;
@@ -172,6 +172,7 @@ class UserManager {
             $mail->send();
             return true;
         } catch (Exception $e) {
+            die("Erreur d'envoi d'email : " . $mail->ErrorInfo);
             return false;
         }
     }
