@@ -474,7 +474,7 @@ include "header.php";
 
             <div class="section-box">
                 <h2><?= msg('section_payment') ?></h2>
-                <div id="paypal-button-container"></div>
+                <div id="paypal-button-container" style="display: none;"></div>
                 <p style="font-size:0.8rem; color:#666; margin-top:5px;"><?= msg('notice_simulation') ?></p>
             </div>
 
@@ -508,9 +508,9 @@ include "header.php";
     </div>
 </div>
 
+<script src="https://www.paypal.com/sdk/js?client-id=<?= $_ENV['PAYPAL_CLIENT_ID'] ?>&currency=EUR"></script>
 <?php include "footer.php"; ?>
 
-<script src="https://www.paypal.com/sdk/js?client-id=&currency=EUR"></script>
 <script>
     let totalCommande = "<?= number_format($cartPrice, 2, '.', '') ?>";
 
@@ -560,12 +560,7 @@ include "header.php";
         }
     }
     function unlockButton() {
-        const btn = document.getElementById('btnRegister');
-        
-        btn.disabled = false;
-        
-        btn.style.opacity = '1';
-        btn.style.cursor = 'pointer';
+        document.getElementById('paypal-button-container').style.display = 'block';
     }
 </script>
 

@@ -172,7 +172,6 @@ class UserManager {
             $mail->send();
             return true;
         } catch (Exception $e) {
-            die("Erreur d'envoi d'email : " . $mail->ErrorInfo);
             return false;
         }
     }
