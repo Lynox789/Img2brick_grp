@@ -52,6 +52,14 @@ if (!$isLogged) {
 // PROCESSING OF THE FORM
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
+    $paypalOrderId = $_POST['paypal_order_id'] ?? null;
+    $paypalStatus  = $_POST['paypal_status'] ?? null;
+
+    if (!$paypalOrderId || $paypalStatus !== 'COMPLETED') {
+        echo json_encode(['success' => false, 'error' => 'Paiement non confirmé par PayPal.']);
+        exit;
+    }
+
     // We start a transaction so that everything is recorded (Order + Invoice) or nothing at all
     $db->beginTransaction();
 
@@ -103,12 +111,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $userId = $_SESSION['user_id'];
         }
 
-        // MOCK PAYMENT MANAGEMENT
-        $cardNumber = str_replace(' ', '', $_POST['card_number']);
-        // We accept 4242... or the default value of the form
-        if (substr($cardNumber, 0, 4) !== '4242' || $_POST['cvc'] !== '123') {
-            throw new Exception("Paiement refusé. Utilisez la carte de test (4242...).");
-        }
 
         // MOCK PAYMENT MANAGEMENT
         // We build the complete address
@@ -253,13 +255,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         unset($_SESSION['current_image_id']);
         unset($_SESSION['redirect_after_auth']);
         
-        header("Location: confirmation.php?order_id=" . $orderId);
+        echo json_encode(['success' => true, 'order_id' => $orderId]);
         exit;
 
     } catch (Exception $e) {
         $db->rollBack(); // Total cancellation in case of error (no defective order without invoice)
-        $error = "Erreur lors du traitement : " . $e->getMessage();
-        error_log($e->getMessage()); // Log pour le débug
+        echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        error_log($e->getMessage());
+        exit;
     }
 }
 
@@ -471,17 +474,13 @@ include "header.php";
 
             <div class="section-box">
                 <h2><?= msg('section_payment') ?></h2>
-                <div class="mock-payment">
-                    <div class="form-group"><label><?= msg('lbl_card') ?></label><input type="text" name="card_number" value="4242 4242 4242 4242"></div>
-                    <div class="form-row">
-                        <div><label><?= msg('lbl_expiry') ?></label><input type="text" name="expiry" value="12/34"></div>
-                        <div><label><?= msg('lbl_cvc') ?></label><input type="text" name="cvc" value="123"></div>
-                    </div>
-                    <p style="font-size:0.8rem; color:#666; margin-top:5px;"><?= msg('notice_simulation') ?></p>
-                </div>
+                <div id="paypal-button-container"></div>
+                <p style="font-size:0.8rem; color:#666; margin-top:5px;"><?= msg('notice_simulation') ?></p>
             </div>
 
-            <button type="submit" class="btn-confirm" id="btnRegister" disabled><?= msg('btn_pay_order') ?></button>
+            <button type="submit" class="btn-confirm" id="btnRegister" disabled style="display:none;">
+                <?= msg('btn_pay_order') ?>
+            </button>
         </form>
     </div>
 
@@ -511,6 +510,38 @@ include "header.php";
 
 <?php include "footer.php"; ?>
 
+<script src="https://www.paypal.com/sdk/js?client-id=&currency=EUR"></script>
+<script>
+    let totalCommande = "<?= number_format($cartPrice, 2, '.', '') ?>";
+
+    paypal.Buttons({
+        createOrder: function(data, actions) {
+            return actions.order.create({
+                purchase_units: [{ amount: { value: totalCommande } }]
+            });
+        },
+        onApprove: function(data, actions) {
+            return actions.order.capture().then(function(details) {
+                const formData = new FormData(document.querySelector('form'));
+                formData.append('paypal_order_id', data.orderID);
+                formData.append('paypal_status', details.status);
+
+                fetch('checkout.php', { method: 'POST', body: formData })
+                    .then(res => res.json())
+                    .then(result => {
+                        if (result.success) {
+                            window.location.href = "confirmation.php?order_id=" + result.order_id;
+                        } else {
+                            alert('Erreur : ' + result.error);
+                        }
+                    });
+            });
+        },
+        onCancel: function() { alert('Paiement annulé.'); },
+        onError: function(err) { console.error(err); alert('Erreur PayPal.'); }
+    }).render('#paypal-button-container');
+</script>
+
 <script>
     function toggleAuth(cb) {
         const reg = document.getElementById('register-fields');
@@ -537,3 +568,4 @@ include "header.php";
         btn.style.cursor = 'pointer';
     }
 </script>
+
