@@ -134,7 +134,6 @@ include "header.php";
                     <div class="order-body">
                         <img src="<?= $imgSrc ?>" alt="Aperçu Mosaïque" class="order-thumb">
                         <div class="order-info">
-                            <h3><?= ucfirst($order['selected_style']) ?></h3>
                             <p><?= msg('lbl_size') ?> <?= $order['target_size'] ?>x<?= $order['target_size'] ?> tenons</p>
                             <span class="order-price"><?= number_format($order['total_price'], 2) ?> €</span>
                         </div>

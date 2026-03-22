@@ -270,10 +270,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <td style="padding:8px 16px;font-size:14px;font-weight:600;color:#1e293b;text-align:right;">#' . str_pad($orderId, 6, '0', STR_PAD_LEFT) . '</td>
                     </tr>
                     <tr>
-                        <td style="padding:8px 16px;font-size:14px;color:#64748b;">' . ($lang == 'fr' ? 'Style' : 'Style') . '</td>
-                        <td style="padding:8px 16px;font-size:14px;font-weight:600;color:#1e293b;text-align:right;">' . ucfirst($cartStyle) . '</td>
-                    </tr>
-                    <tr>
                         <td style="padding:8px 16px;font-size:14px;color:#64748b;">' . ($lang == 'fr' ? 'Nombre de pièces' : 'Brick count') . '</td>
                         <td style="padding:8px 16px;font-size:14px;font-weight:600;color:#1e293b;text-align:right;">' . $proposal['total_bricks_count'] . '</td>
                     </tr>
