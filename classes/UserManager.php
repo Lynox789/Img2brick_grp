@@ -267,7 +267,7 @@ class UserManager {
                                     <!-- Fallback link -->
                                     <p style="margin:24px 0 0; color:#94a3b8; font-size:12px; line-height:1.6;">
                                         ' . msg('email_reset_fallback') . '<br>
-                                        <a href="' . $link . '" style="color:#3b82f6; word-break:break-all;">' . $link . '</a>
+                                        <a href="' . $link . '" style="color:#3b82f6; word-break:break-all;"> Img2Brick  </a>
                                     </p>
 
                                 </td>

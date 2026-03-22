@@ -4,7 +4,7 @@ require('fpdf/fpdf.php');
 
 // Security and Invoice Recovery
 if (!isset($_SESSION['user_id']) || !isset($_GET['order_id'])) {
-    die("Accès refusé.");
+    die(msg('pdf_access_denied'));
 }
 
 $userId = $_SESSION['user_id'];
@@ -22,7 +22,7 @@ $stmt->execute([$orderId, $userId]);
 $facture = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$facture) {
-    die("Facture introuvable ou vous n'avez pas les droits.");
+    die(msg('pdf_invoice_not_found'));
 }
 
 // Recovery of billing lines (The "Global Kit")
@@ -73,14 +73,14 @@ class PDF extends FPDF {
         
         $this->SetFont('Arial','B',15);
         $this->Cell(80);
-        $this->Cell(30,10,'FACTURE',0,0,'C');
+        $this->Cell(30,10,utf8_decode(msg('pdf_invoice_title')),0,0,'C');
         $this->Ln(20);
     }
 
     function Footer() {
         $this->SetY(-15);
         $this->SetFont('Arial','I',8);
-        $this->Cell(0,10,'Page '.$this->PageNo().'/{nb}',0,0,'C');
+        $this->Cell(0,10,utf8_decode(msg('pdf_page')).$this->PageNo().'/{nb}',0,0,'C');
     }
     
     // Utility function to convert Hex (#FF0000) to RGB for FPDF
@@ -109,7 +109,7 @@ $pdf->Cell(0, 6, utf8_decode("SIRET: 123 456 789 00012"), 0, 1);
 // Invoice Info (Right Frame)
 $pdf->SetXY(120, 40);
 $pdf->SetFont('Arial','B',11);
-$pdf->Cell(30, 6, utf8_decode("N° Facture : "), 0, 0);
+$pdf->Cell(30, 6, utf8_decode(msg('pdf_invoice_num')), 0, 0);
 $pdf->SetFont('Arial','',11);
 // We use str_pad to have a proper number (ex: 000042)
 $numFac = str_pad($facture['id_facture'], 6, '0', STR_PAD_LEFT); 
@@ -117,7 +117,7 @@ $pdf->Cell(0, 6, $numFac, 0, 1);
 
 $pdf->SetXY(120, 46);
 $pdf->SetFont('Arial','B',11);
-$pdf->Cell(30, 6, utf8_decode("Date : "), 0, 0);
+$pdf->Cell(30, 6, utf8_decode(msg('pdf_invoice_date')), 0, 0);
 $pdf->SetFont('Arial','',11);
 $dateDoc = date("d/m/Y", strtotime($facture['date_document']));
 $pdf->Cell(0, 6, $dateDoc, 0, 1);
@@ -126,7 +126,7 @@ $pdf->Cell(0, 6, $dateDoc, 0, 1);
 $pdf->Ln(15);
 $pdf->SetX(110);
 $pdf->SetFont('Arial','B',12);
-$pdf->Cell(0, 6, utf8_decode("ADRESSE DE FACTURATION"), 0, 1);
+$pdf->Cell(0, 6, utf8_decode(msg('pdf_billing_address')), 0, 1);
 $pdf->SetX(110);
 $pdf->SetFont('Arial','',11);
 $pdf->MultiCell(80, 6, utf8_decode(
@@ -138,15 +138,15 @@ $pdf->MultiCell(80, 6, utf8_decode(
 // MAIN TABLE (Invoice Lines) 
 $pdf->Ln(20);
 $pdf->SetFont('Arial','B',12);
-$pdf->Cell(0, 10, utf8_decode("Récapitulatif de la commande"), 0, 1);
+$pdf->Cell(0, 10, utf8_decode(msg('pdf_order_summary')), 0, 1);
 
 // Headers
 $pdf->SetFillColor(230,230,230);
 $pdf->SetFont('Arial','B',10);
-$pdf->Cell(110, 8, utf8_decode("Désignation"), 1, 0, 'L', true);
-$pdf->Cell(20, 8, utf8_decode("Qté"), 1, 0, 'C', true);
-$pdf->Cell(30, 8, utf8_decode("P.U. HT"), 1, 0, 'R', true);
-$pdf->Cell(30, 8, utf8_decode("Total HT"), 1, 1, 'R', true);
+$pdf->Cell(110, 8, utf8_decode(msg('pdf_designation')), 1, 0, 'L', true);
+$pdf->Cell(20, 8, utf8_decode(msg('pdf_qty')), 1, 0, 'C', true);
+$pdf->Cell(30, 8, utf8_decode(msg('pdf_unit_price_ht')), 1, 0, 'R', true);
+$pdf->Cell(30, 8, utf8_decode(msg('pdf_total_ht')), 1, 1, 'R', true);
 
 // Data
 $pdf->SetFont('Arial','',10);
@@ -176,7 +176,7 @@ foreach ($lignesFacture as $ligne) {
         $y = $pdf->GetY();
         
         $pdf->SetFont('Arial', 'I', 8);
-        $pdf->Cell(190, 6, utf8_decode("Visuel archivé :"), 'LR', 1, 'L');
+        $pdf->Cell(190, 6, utf8_decode(msg('pdf_archived_visual')), 'LR', 1, 'L');
         
         $pdf->Image($tempImageFile, 20, $pdf->GetY(), 30); 
         
@@ -193,16 +193,16 @@ $ttc = $totalHT + $tva;
 $posX = 140; 
 
 $pdf->SetX($posX);
-$pdf->Cell(20, 6, utf8_decode("Total HT"), 0, 0, 'R'); 
+$pdf->Cell(20, 6, utf8_decode(msg('pdf_total_ht')), 0, 0, 'R'); 
 $pdf->Cell(30, 6, number_format($totalHT, 2, ',', ' ').chr(128), 1, 1, 'R'); 
 
 $pdf->SetX($posX);
-$pdf->Cell(20, 6, utf8_decode("TVA 20%"), 0, 0, 'R'); 
+$pdf->Cell(20, 6, utf8_decode(msg('pdf_tax_20')), 0, 0, 'R'); 
 $pdf->Cell(30, 6, number_format($tva, 2, ',', ' ').chr(128), 1, 1, 'R'); 
 
 $pdf->SetX($posX);
 $pdf->SetFont('Arial','B',11); 
-$pdf->Cell(20, 8, utf8_decode("NET TTC"), 0, 0, 'R'); 
+$pdf->Cell(20, 8, utf8_decode(msg('pdf_net_ttc')), 0, 0, 'R'); 
 $pdf->SetFillColor(220, 255, 220); 
 $pdf->Cell(30, 8, number_format($ttc, 2, ',', ' ').chr(128), 1, 1, 'R', true); 
 
@@ -212,19 +212,19 @@ if (!empty($listeBriques)) {
     $pdf->AddPage(); // We change pages for the detailed list
     
     $pdf->SetFont('Arial','B',14);
-    $pdf->Cell(0, 10, utf8_decode("Inventaire détaillé des pièces (" . count($listeBriques) . " références)"), 0, 1, 'L');
+    $pdf->Cell(0, 10, utf8_decode(msg('pdf_detailed_inventory')) . count($listeBriques) . utf8_decode(msg('pdf_references')), 0, 1, 'L');
     $pdf->Ln(5);
 
     // Headers Table of Bricks
     $pdf->SetFont('Arial','B',9);
     $pdf->SetFillColor(240,240,240);
     
-    $pdf->Cell(20, 8, "Apercu", 1, 0, 'C', true);
-    $pdf->Cell(50, 8, "Forme", 1, 0, 'L', true);
-    $pdf->Cell(50, 8, "Couleur", 1, 0, 'L', true);
-    $pdf->Cell(20, 8, "Ref", 1, 0, 'C', true); // Code Hexa
-    $pdf->Cell(25, 8, "Qté", 1, 0, 'C', true);
-    $pdf->Cell(25, 8, "Prix Est.", 1, 1, 'R', true); // estimated price
+    $pdf->Cell(20, 8, utf8_decode(msg('pdf_preview')), 1, 0, 'C', true);
+    $pdf->Cell(50, 8, utf8_decode(msg('pdf_shape')), 1, 0, 'L', true);
+    $pdf->Cell(50, 8, utf8_decode(msg('pdf_color')), 1, 0, 'L', true);
+    $pdf->Cell(20, 8, utf8_decode(msg('pdf_ref')), 1, 0, 'C', true); 
+    $pdf->Cell(25, 8, utf8_decode(msg('pdf_qty')), 1, 0, 'C', true);
+    $pdf->Cell(25, 8, utf8_decode(msg('pdf_est_price')), 1, 1, 'R', true); 
 
     $pdf->SetFont('Arial','',9);
     
@@ -252,11 +252,11 @@ if (!empty($listeBriques)) {
     
     $pdf->Ln(10);
     $pdf->SetFont('Arial','I',8);
-    $pdf->Cell(0, 5, utf8_decode("* Les prix unitaires des pièces sont donnés à titre indicatif selon le cours moyen du marché Lego."), 0, 1);
+    $pdf->Cell(0, 5, utf8_decode(msg('pdf_price_disclaimer')), 0, 1);
 }
 
 // Output
-$pdf->Output('I', 'Facture_'.$facture['id_facture'].'.pdf');
+$pdf->Output('I', msg('pdf_filename_prefix').$facture['id_facture'].'.pdf');
 
 // We delete the temporary image file from the server
 if ($tempImageFile && file_exists($tempImageFile)) {
