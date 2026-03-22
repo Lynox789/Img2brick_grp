@@ -92,7 +92,7 @@ if (isset($_POST['email'])) {
 <div class="fp-card">
     <div class="fp-header">
         <p class="fp-logo">Img2brick</p>
-        <p class="fp-logo-sub">Transformez vos images en mosaïques</p>
+        <p class="fp-logo-sub"><?= msg('site_slogan') ?></p>
         <div class="fp-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
@@ -119,7 +119,7 @@ if (isset($_POST['email'])) {
 
         <form method="post">
             <label class="fp-label"><?= msg('placeholder_email') ?></label>
-            <input class="fp-input" type="email" name="email" placeholder="votre@email.com" required>
+            <input class="fp-input" type="email" name="email" placeholder="<?= msg('placeholder_email_example') ?>" required>
             <button class="fp-btn" type="submit"><?= msg('forgot_btn_send') ?></button>
         </form>
     </div>

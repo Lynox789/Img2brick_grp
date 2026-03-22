@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$encFirstname, $encLastname, $cleanEmail, $userId]);
 
             
-            $sujet = "Mise à jour de vos informations personnelles";
+            $sujet = msg('email_subj_update_info');
             $corps = '
             <!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"></head>
             <body style="margin:0;padding:0;background:#f1f5f9;font-family:Poppins,Arial,sans-serif;">
@@ -50,20 +50,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
                 <tr><td style="background:#3b82f6;padding:40px 30px;border-radius:16px 16px 0 0;text-align:center;">
                     <h1 style="margin:0;color:white;font-size:28px;font-weight:800;">Img2brick</h1>
-                    <p style="margin:8px 0 0;color:rgba(255,255,255,0.8);font-size:14px;">Transformez vos images en mosaïques</p>
+                    <p style="margin:8px 0 0;color:rgba(255,255,255,0.8);font-size:14px;">' . msg('email_slogan') . '</p>
                 </td></tr>
                 <tr><td style="background:white;padding:40px 40px 30px;">
-                    <h2 style="margin:0 0 12px;color:#1e293b;font-size:22px;font-weight:700;">Informations personnelles modifiées</h2>
+                    <h2 style="margin:0 0 12px;color:#1e293b;font-size:22px;font-weight:700;">' . msg('email_update_h2') . '</h2>
                     <p style="margin:0 0 24px;color:#64748b;font-size:15px;line-height:1.6;">
-                        Bonjour,<br><br>
-                        Vos informations personnelles (Nom, Prénom ou Email) ont été modifiées avec succès sur votre compte img2brick.
+                        ' . msg('email_update_desc') . '
                     </p>
                     <div style="background:#fef9c3;border:1px solid #fde68a;border-radius:8px;padding:14px 16px;">
-                        <p style="margin:0;color:#92400e;font-size:13px;">ATTENTION: Si vous n\'êtes pas à l\'origine de cette modification, contactez-nous immédiatement.</p>
+                        <p style="margin:0;color:#92400e;font-size:13px;">' . msg('email_update_warning') . '</p>
                     </div>
                 </td></tr>
                 <tr><td style="background:#f8fafc;padding:20px 40px;border-radius:0 0 16px 16px;border-top:1px solid #e2e8f0;text-align:center;">
-                    <p style="margin:0;color:#94a3b8;font-size:12px;">© ' . date('Y') . ' img2brick — Tous droits réservés<br>Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
+                    <p style="margin:0;color:#94a3b8;font-size:12px;">© ' . date('Y') . ' img2brick ' . msg('email_footer_copyright') . '</p>
                 </td></tr>
             </table>
             </td></tr></table>
@@ -110,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                  // $userEmail = Security::decrypt($currentEmail); 
                  $userEmail = $currentEmail; 
 
-                $sujet = "Mise à jour de vos coordonnées";
+                $sujet = msg('email_subj_update_contact');
                 $corps = '
                 <!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"></head>
                 <body style="margin:0;padding:0;background:#f1f5f9;font-family:Poppins,Arial,sans-serif;">
@@ -119,20 +118,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
                     <tr><td style="background:#3b82f6;padding:40px 30px;border-radius:16px 16px 0 0;text-align:center;">
                         <h1 style="margin:0;color:white;font-size:28px;font-weight:800;">Img2brick</h1>
-                        <p style="margin:8px 0 0;color:rgba(255,255,255,0.8);font-size:14px;">Transformez vos images en mosaïques</p>
+                        <p style="margin:8px 0 0;color:rgba(255,255,255,0.8);font-size:14px;">' . msg('email_slogan') . '</p>
                     </td></tr>
                     <tr><td style="background:white;padding:40px 40px 30px;">
-                        <h2 style="margin:0 0 12px;color:#1e293b;font-size:22px;font-weight:700;">Coordonnées mises à jour</h2>
+                        <h2 style="margin:0 0 12px;color:#1e293b;font-size:22px;font-weight:700;">' . msg('email_contact_h2') . '</h2>
                         <p style="margin:0 0 24px;color:#64748b;font-size:15px;line-height:1.6;">
-                            Bonjour,<br><br>
-                            Votre adresse de livraison ou votre numéro de téléphone a été mis à jour avec succès.
+                            ' . msg('email_contact_desc') . '
                         </p>
                         <div style="background:#fef9c3;border:1px solid #fde68a;border-radius:8px;padding:14px 16px;">
-                            <p style="margin:0;color:#92400e;font-size:13px;">ATTENTION: Si vous n\'êtes pas à l\'origine de cette modification, contactez-nous immédiatement.</p>
+                            <p style="margin:0;color:#92400e;font-size:13px;">' . msg('email_update_warning') . '</p>
                         </div>
                     </td></tr>
                     <tr><td style="background:#f8fafc;padding:20px 40px;border-radius:0 0 16px 16px;border-top:1px solid #e2e8f0;text-align:center;">
-                        <p style="margin:0;color:#94a3b8;font-size:12px;">© ' . date('Y') . ' img2brick — Tous droits réservés<br>Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
+                        <p style="margin:0;color:#94a3b8;font-size:12px;">© ' . date('Y') . ' img2brick ' . msg('email_footer_copyright') . '</p>
                     </td></tr>
                 </table>
                 </td></tr></table>

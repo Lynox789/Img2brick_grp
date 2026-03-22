@@ -75,21 +75,21 @@ if (isset($_POST['register'])) {
                 <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
                     <tr><td style="background:#3b82f6;padding:40px 30px;border-radius:16px 16px 0 0;text-align:center;">
                         <h1 style="margin:0;color:white;font-size:28px;font-weight:800;">Img2brick</h1>
-                        <p style="margin:8px 0 0;color:rgba(255,255,255,0.8);font-size:14px;">Transformez vos images en mosaïques</p>
+                        <p style="margin:8px 0 0;color:rgba(255,255,255,0.8);font-size:14px;">' . msg('email_slogan') . '</p>
                     </td></tr>
                     <tr><td style="background:white;padding:40px 40px 30px;">
-                        <h2 style="margin:0 0 12px;color:#1e293b;font-size:22px;font-weight:700;">Confirmez votre inscription</h2>
-                        <p style="margin:0 0 24px;color:#64748b;font-size:15px;line-height:1.6;">Utilisez le code ci-dessous pour valider votre compte. Il est valable quelques minutes.</p>
+                        <h2 style="margin:0 0 12px;color:#1e293b;font-size:22px;font-weight:700;">' . msg('email_confirm_h2') . '</h2>
+                        <p style="margin:0 0 24px;color:#64748b;font-size:15px;line-height:1.6;">' . msg('email_confirm_desc') . '</p>
                         <div style="background:#f1f5f9;border-radius:12px;padding:24px;text-align:center;margin-bottom:24px;">
-                            <p style="margin:0 0 8px;color:#64748b;font-size:13px;">Votre code de vérification</p>
+                            <p style="margin:0 0 8px;color:#64748b;font-size:13px;">' . msg('email_confirm_code_label') . '</p>
                             <p style="margin:0;font-size:36px;font-weight:800;letter-spacing:10px;color:#1e293b;">' . $verificationCode . '</p>
                         </div>
                         <div style="background:#fef9c3;border:1px solid #fde68a;border-radius:8px;padding:14px 16px;">
-                            <p style="margin:0;color:#92400e;font-size:13px;">ATTENTION: Si vous n\'avez pas créé de compte, ignorez cet email.</p>
+                            <p style="margin:0;color:#92400e;font-size:13px;">' . msg('email_confirm_warning') . '</p>
                         </div>
                     </td></tr>
                     <tr><td style="background:#f8fafc;padding:20px 40px;border-radius:0 0 16px 16px;border-top:1px solid #e2e8f0;text-align:center;">
-                        <p style="margin:0;color:#94a3b8;font-size:12px;">© ' . date('Y') . ' img2brick — Tous droits réservés</p>
+                        <p style="margin:0;color:#94a3b8;font-size:12px;">© ' . date('Y') . ' img2brick ' . msg('email_footer_copyright') . '</p>
                     </td></tr>
                 </table>
                 </td></tr></table>

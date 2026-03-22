@@ -117,8 +117,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <?php include 'header.php'; ?>
     <div class="rp-card">
         <div class="rp-header">
-            <p class="rp-logo">🧱 img2brick</p>
-            <p class="rp-logo-sub">Transformez vos images en mosaïques</p>
+            <p class="rp-logo">Img2brick</p>
+            <p class="rp-logo-sub"><?= msg('site_slogan') ?></p>
             <div class="rp-icon">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
@@ -134,13 +134,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <polyline points="20 6 9 17 4 12"/>
                         </svg>
                     </div>
-                    <h2 class="rp-title">Mot de passe modifié !</h2>
-                    <p class="rp-desc">Votre mot de passe a été mis à jour avec succès. Vous pouvez maintenant vous connecter.</p>
-                    <a href="inscription.php" class="rp-btn" style="display:block; text-decoration:none; text-align:center;">Se connecter</a>
+                    <h2 class="rp-title"><?= msg('reset_success_title') ?></h2>
+                    <p class="rp-desc"><?= msg('reset_success_desc') ?></p>
+                    <a href="inscription.php" class="rp-btn" style="display:block; text-decoration:none; text-align:center;"><?= msg('reset_btn_login') ?></a>
                 </div>
             <?php else: ?>
-                <h2 class="rp-title">Nouveau mot de passe</h2>
-                <p class="rp-desc">Choisissez un mot de passe sécurisé pour votre compte.</p>
+                <h2 class="rp-title"><?= msg('reset_form_title') ?></h2>
+                <p class="rp-desc"><?= msg('reset_form_desc') ?></p>
 
                 <?php if ($message): ?>
                     <div class="rp-alert rp-error">
@@ -152,22 +152,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <?php endif; ?>
 
                 <div class="rp-hint">
-                    <strong>Exigences du mot de passe</strong>
-                    Minimum 12 caractères · 1 majuscule · 1 minuscule · 1 chiffre · 1 caractère spécial
+                    <strong><?= msg('reset_pwd_req_title') ?></strong><br>
+                    <?= msg('reset_pwd_req_desc') ?>
                 </div>
 
                 <form method="post">
-                    <label class="rp-label">Nouveau mot de passe</label>
-                    <input class="rp-input" type="password" name="new_password" placeholder="••••••••••••" required>
-                    <label class="rp-label">Confirmer le mot de passe</label>
-                    <input class="rp-input" type="password" name="confirm_password" placeholder="••••••••••••" required>
-                    <button class="rp-btn" type="submit">Valider le nouveau mot de passe</button>
+                    <label class="rp-label"><?= msg('reset_lbl_new_pwd') ?></label>
+                    <input class="rp-input" type="password" name="new_password" placeholder="************" required>
+                    <label class="rp-label"><?= msg('reset_lbl_confirm_pwd') ?></label>
+                    <input class="rp-input" type="password" name="confirm_password" placeholder="************" required>
+                    <button class="rp-btn" type="submit"><?= msg('reset_btn_submit') ?></button>
                 </form>
             <?php endif; ?>
         </div>
 
         <div class="rp-footer">
-            <a href="inscription.php" class="rp-link">← Retour à la connexion</a>
+            <a href="inscription.php" class="rp-link">← <?= msg('link_back_login') ?></a>
         </div>
     </div>
 </body>

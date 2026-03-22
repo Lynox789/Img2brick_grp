@@ -203,10 +203,10 @@ class UserManager {
         // Link preparation to send in the email, the user will have to clik to this link to be send in reset_password page
         $link = "http://localhost/Img2brick_grp/reset_password.php?token=" . $token;
 
-        $subject = "Réinitialisation de votre mot de passe";
+        $subject = msg('email_subj_reset');
         $body = '
         <!DOCTYPE html>
-        <html lang="fr">
+        <html lang="en">
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -225,7 +225,7 @@ class UserManager {
                                         Img2brick
                                     </h1>
                                     <p style="margin:8px 0 0; color:rgba(255,255,255,0.8); font-size:14px;">
-                                        Transformez vos images en mosaïques
+                                        ' . msg('email_slogan') . '
                                     </p>
                                 </td>
                             </tr>
@@ -235,10 +235,10 @@ class UserManager {
                                 <td style="background:white; padding: 40px 40px 30px;">
                                     
                                     <h2 style="margin:0 0 12px; color:#1e293b; font-size:22px; font-weight:700;">
-                                        Réinitialisation de mot de passe
+                                        ' . msg('email_reset_h2') . '
                                     </h2>
                                     <p style="margin:0 0 24px; color:#64748b; font-size:15px; line-height:1.6;">
-                                        Vous avez demandé à réinitialiser votre mot de passe. Cliquez sur le bouton ci-dessous pour en choisir un nouveau.
+                                        ' . msg('email_reset_desc') . '
                                     </p>
 
                                     <!-- Button -->
@@ -247,7 +247,7 @@ class UserManager {
                                             <td align="center" style="padding: 10px 0 30px;">
                                                 <a href="' . $link . '" 
                                                 style="display:inline-block; background:#3b82f6; color:white; text-decoration:none; padding:14px 36px; border-radius:8px; font-size:15px; font-weight:600;">
-                                                    Réinitialiser mon mot de passe
+                                                    ' . msg('email_reset_btn') . '
                                                 </a>
                                             </td>
                                         </tr>
@@ -258,7 +258,7 @@ class UserManager {
                                         <tr>
                                             <td style="background:#fef9c3; border:1px solid #fde68a; border-radius:8px; padding:14px 16px;">
                                                 <p style="margin:0; color:#92400e; font-size:13px; line-height:1.5;">
-                                                    ATTENTION : Ce lien est valable <strong>1 minute</strong> seulement. Si vous n\'avez pas fait cette demande, ignorez cet email.
+                                                    ' . msg('email_reset_warning') . '
                                                 </p>
                                             </td>
                                         </tr>
@@ -266,7 +266,7 @@ class UserManager {
 
                                     <!-- Fallback link -->
                                     <p style="margin:24px 0 0; color:#94a3b8; font-size:12px; line-height:1.6;">
-                                        Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :<br>
+                                        ' . msg('email_reset_fallback') . '<br>
                                         <a href="' . $link . '" style="color:#3b82f6; word-break:break-all;">' . $link . '</a>
                                     </p>
 
@@ -277,8 +277,7 @@ class UserManager {
                             <tr>
                                 <td style="background:#f8fafc; padding:20px 40px; border-radius:0 0 16px 16px; border-top:1px solid #e2e8f0;">
                                     <p style="margin:0; color:#94a3b8; font-size:12px; text-align:center; line-height:1.6;">
-                                        © ' . date('Y') . ' img2brick — Tous droits réservés<br>
-                                        Cet email a été envoyé automatiquement, merci de ne pas y répondre.
+                                        © ' . date('Y') . ' img2brick ' . msg('email_footer_copyright') . '
                                     </p>
                                 </td>
                             </tr>

@@ -456,7 +456,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
 
         <button id="submitBtn" type="submit"><?= msg('btn_continue') ?></button>
     </form>
-    </section>
+    <div style="text-align:center; margin-top:100px;">
+        <a href="jeux.php" style="
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 22px;
+            border-radius: 8px;
+            border: 1.5px solid #cbd5e1;
+            background: white;
+            color: #475569;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: border-color 0.2s, color 0.2s, background 0.2s;
+        "
+        onmouseover="this.style.borderColor='#3b82f6'; this.style.color='#3b82f6'; this.style.background='#eff6ff';"
+        onmouseout="this.style.borderColor='#cbd5e1'; this.style.color='#475569'; this.style.background='white';">
+            <?= msg('btn_play_game') ?>
+        </a>
+    </div>    
+</section>
 </div>
 
     <?php include "footer.php"; ?>
