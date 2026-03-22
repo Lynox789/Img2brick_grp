@@ -176,7 +176,7 @@ foreach ($lignesFacture as $ligne) {
         $y = $pdf->GetY();
         
         $pdf->SetFont('Arial', 'I', 8);
-        $pdf->Cell(190, 6, utf8_decode("Visuel archivé (Preuve d'intégrité) :"), 'LR', 1, 'L');
+        $pdf->Cell(190, 6, utf8_decode("Visuel archivé :"), 'LR', 1, 'L');
         
         $pdf->Image($tempImageFile, 20, $pdf->GetY(), 30); 
         
