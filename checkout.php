@@ -30,8 +30,7 @@ $imageId = $proposal['image_id']; // The source image ID
 $imagePath = "uploads/preview_" . $propId . ".png"; // The path of the generated image
 // Calculation of variables for display (Mapping old cart -> BDD)
 $cartStyle = str_replace('ALGO_', 'Algo ', $proposal['strategy']); // Ex: Algo 5
-$cartPrice = $proposal['estimated_cost'] > 0 ? $proposal['estimated_cost'] : ($proposal['total_bricks_count'] * 0.10); // Calcul prix
-
+$cartPrice = $proposal['total_bricks_count'] * 0.10;
 $error = "";
 $isLogged = isset($_SESSION['user_id']);
 

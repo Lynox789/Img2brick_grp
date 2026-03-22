@@ -32,7 +32,7 @@ $isReady = ($proposal['total_bricks_count'] > 0);
 $isError = ($proposal['total_bricks_count'] == -2); // Si tu as géré le cas d'erreur dans Java
 
 // Price calculation (If Java has put it in the database, we take it; otherwise, we calculate it)
-$price = $proposal['estimated_cost'] > 0 ? $proposal['estimated_cost'] : ($proposal['total_bricks_count'] * 0.10);
+$price = $proposal['total_bricks_count'] * 0.10;
 
 ?>
 <?php include "header.php"; ?>

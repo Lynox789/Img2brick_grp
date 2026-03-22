@@ -151,8 +151,12 @@ if (isset($_POST['choose_render']) && isset($_POST['proposal_id']) && isset($_PO
                             <?= $desc ?>
                         </p>
                         <?php if ($isReady): ?>
+                            <?php 
+                                $prixCalcule = $p['total_bricks_count'] * 0.10; 
+                            ?>
                             <div style="text-align: center; margin-bottom: 20px; font-weight: bold; color: #166534; background: #f0fdf4; padding: 10px; border-radius: 8px;">
-                                 <?= number_format($p['estimated_cost'], 2, ',', ' ') ?> €
+                                 <?= $p['total_bricks_count'] ?> pièces<br>
+                                 <?= number_format($prixCalcule, 2, ',', ' ') ?> €
                             </div>
                             <form method="post">
                                 <input type="hidden" name="proposal_id" value="<?= $p['id'] ?>">
