@@ -49,6 +49,19 @@ if (!$isLogged) {
     $_SESSION['redirect_after_auth'] = 'checkout.php';
 }
 
+$userData = [];
+if ($isLogged) {
+    $userId = $_SESSION['user_id'];
+    $stmtUser = $db->prepare("SELECT email, address, zipcode, city, country, phone FROM users WHERE id = ?");
+    $stmtUser->execute([$userId]);
+    $userData = $stmtUser->fetch(PDO::FETCH_ASSOC);
+
+    if (!empty($userData['address'])) $userData['address'] = Security::decrypt($userData['address']);
+    if (!empty($userData['phone']))   $userData['phone']   = Security::decrypt($userData['phone']);
+
+}
+
+
 // PROCESSING OF THE FORM
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -64,84 +77,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $db->beginTransaction();
 
     try {
-        $userId = 0;
 
-        // AUTHENTICATION MANAGEMENT (Login or Quick Registration)
-        if (!$isLogged) {
+    $userId = $_SESSION['user_id'];
 
-            // CASE 1: Connection
-            if (isset($_POST['has_account']) && $_POST['has_account'] == '1') {
-                $email = $_POST['login_email'];
-                $pass  = $_POST['login_password'];
+    // MOCK PAYMENT MANAGEMENT
+    // We build the complete address
+    $fullAddress = Security::encrypt($_POST['address'] . ", " . $_POST['zipcode'] . " " . $_POST['city'] . ", " . $_POST['country']);
+    $phone = Security::encrypt($_POST['phone']);
 
-                $stmtUser = $db->prepare("SELECT id, password FROM users WHERE email = ?");
-                $stmtUser->execute([$email]);
-                $user = $stmtUser->fetch();
+    $sqlOrder = "INSERT INTO commandes (user_id, image_id, final_image_path, selected_style, total_price, statut, date_commande, delivery_address, delivery_phone) VALUES (?, ?, ?, ?, ?, 'payée', NOW(), ?, ?)";
+    $stmtOrder = $db->prepare($sqlOrder);
+    $stmtOrder->execute([$userId, $imageId, $imagePath, $cartStyle, $cartPrice, $fullAddress, $phone]);
+    
+    $orderId = $db->lastInsertId();
+    
 
-                if ($user && password_verify($pass, $user['password'])) {
-                    $_SESSION['user_id'] = $user['id'];
-                    $userId = $user['id'];
-                } else {
-                    throw new Exception("Email ou mot de passe incorrect.");
-                }
-            }
-            // CASE 2 : Quick Registration
-            else {
-                $email = $_POST['email'];
-                $pass  = $_POST['password'];
+    // Management of the Client (Table 'client')
+    $stmtClient = $db->prepare("SELECT code_client FROM client WHERE user_id = ?");
+    $stmtClient->execute([$userId]);
+    $existingClient = $stmtClient->fetch(PDO::FETCH_ASSOC);
 
-                // Duplicate check
-                $stmtCheck = $db->prepare("SELECT id FROM users WHERE email = ?");
-                $stmtCheck->execute([$email]);
-                if ($stmtCheck->rowCount() > 0) throw new Exception("Cet email est déjà utilisé.");
-
-                // User creation (Simplified logic to adapt to your users table)
-                $hash = password_hash($pass, PASSWORD_DEFAULT);
-
-                // We extract a username from the email
-                $username = explode('@', $email)[0] . '_' . rand(100, 999);
-
-                $stmtReg = $db->prepare("INSERT INTO users (username, email, password, created_at) VALUES (?, ?, ?, NOW())");
-                $stmtReg->execute([$username, $email, $hash]);
-
-                $userId = $db->lastInsertId();
-                $_SESSION['user_id'] = $userId;
-            }
-        } else {
-            $userId = $_SESSION['user_id'];
-        }
-
-
-        // MOCK PAYMENT MANAGEMENT
-        // We build the complete address
-        $fullAddress = Security::encrypt($_POST['address'] . ", " . $_POST['zipcode'] . " " . $_POST['city'] . ", " . $_POST['country']);
-        $phone = Security::encrypt($_POST['phone']);
-
-        $sqlOrder = "INSERT INTO commandes (user_id, image_id, final_image_path, selected_style, total_price, statut, date_commande, delivery_address, delivery_phone) VALUES (?, ?, ?, ?, ?, 'payée', NOW(), ?, ?)";
-        $stmtOrder = $db->prepare($sqlOrder);
-        $stmtOrder->execute([$userId, $imageId, $imagePath, $cartStyle, $cartPrice, $fullAddress, $phone]);
+    if ($existingClient) {
+        $codeClient = $existingClient['code_client'];
+    } else {
+        $codeClient = "CLT-" . str_pad($userId, 5, '0', STR_PAD_LEFT);
+        $clientName = "Client Web " . $userId;
         
-        $orderId = $db->lastInsertId();
+        $stmtNewClt = $db->prepare("INSERT INTO client (code_client, user_id, nom, email_fact) VALUES (?, ?, ?, ?)");
+        $userEmailQuery = $db->prepare("SELECT email FROM users WHERE id = ?");
+        $userEmailQuery->execute([$userId]);
+        $uEmail = $userEmailQuery->fetchColumn();
         
-
-        // Management of the Client (Table 'client')
-        $stmtClient = $db->prepare("SELECT code_client FROM client WHERE user_id = ?");
-        $stmtClient->execute([$userId]);
-        $existingClient = $stmtClient->fetch(PDO::FETCH_ASSOC);
-
-        if ($existingClient) {
-            $codeClient = $existingClient['code_client'];
-        } else {
-            $codeClient = "CLT-" . str_pad($userId, 5, '0', STR_PAD_LEFT);
-            $clientName = "Client Web " . $userId;
-            
-            $stmtNewClt = $db->prepare("INSERT INTO client (code_client, user_id, nom, email_fact) VALUES (?, ?, ?, ?)");
-            $userEmailQuery = $db->prepare("SELECT email FROM users WHERE id = ?");
-            $userEmailQuery->execute([$userId]);
-            $uEmail = $userEmailQuery->fetchColumn();
-            
-            $stmtNewClt->execute([$codeClient, $userId, $clientName, $uEmail]);
-        }
+        $stmtNewClt->execute([$codeClient, $userId, $clientName, $uEmail]);
+    }
 
         // Commercial
         $db->query("INSERT IGNORE INTO commercial (code_commercial, nom_commercial) VALUES ('WEB', 'Site Internet')");
@@ -249,6 +217,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Validation finale
         $db->commit();
+        // Save the address in the profile if empty
+        $stmtCheck = $db->prepare("SELECT address FROM users WHERE id = ? AND (address IS NULL OR address = '')");
+        $stmtCheck->execute([$userId]);
+        if ($stmtCheck->fetch()) {
+            $stmtUpdate = $db->prepare("UPDATE users SET address = ?, zipcode = ?, city = ?, country = ?, phone = ? WHERE id = ?");
+            $stmtUpdate->execute([
+                Security::encrypt($_POST['address']),
+                $_POST['zipcode'],
+                $_POST['city'],
+                $_POST['country'],
+                Security::encrypt($_POST['phone']),
+                $userId
+            ]);
+        }
+
 
         // Nettoyage session
         unset($_SESSION['final_proposal_id']);
@@ -256,6 +239,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         unset($_SESSION['redirect_after_auth']);
         
         echo json_encode(['success' => true, 'order_id' => $orderId]);
+        // Order confirmation email
+        $userEmailQuery = $db->prepare("SELECT email FROM users WHERE id = ?");
+        $userEmailQuery->execute([$userId]);
+        $userEmail = $userEmailQuery->fetchColumn();
+
+        $lang = $_SESSION['lang'] ?? 'fr';
+        $emailBody = '
+        <!DOCTYPE html><html lang="' . $lang . '"><head><meta charset="UTF-8"></head>
+        <body style="margin:0;padding:0;background:#f1f5f9;font-family:Poppins,Arial,sans-serif;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 20px;">
+        <tr><td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+            <tr><td style="background:#3b82f6;padding:40px 30px;border-radius:16px 16px 0 0;text-align:center;">
+                <h1 style="margin:0;color:white;font-size:28px;font-weight:800;">Img2brick</h1>
+                <p style="margin:8px 0 0;color:rgba(255,255,255,0.8);font-size:14px;">Transformez vos images en mosaïques</p>
+            </td></tr>
+            <tr><td style="background:white;padding:40px 40px 30px;">
+                <h2 style="margin:0 0 12px;color:#1e293b;font-size:22px;font-weight:700;">
+                    ' . ($lang == 'fr' ? 'Commande confirmée !' : 'Order confirmed!') . '
+                </h2>
+                <p style="margin:0 0 24px;color:#64748b;font-size:15px;line-height:1.6;">
+                    ' . ($lang == 'fr' ? 'Merci pour votre commande ! Voici le récapitulatif :' : 'Thank you for your order! Here is your summary:') . '
+                </p>
+
+                <!-- Récapitulatif -->
+                <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;border-radius:12px;padding:20px;margin-bottom:24px;">
+                    <tr>
+                        <td style="padding:8px 16px;font-size:14px;color:#64748b;">' . ($lang == 'fr' ? 'Référence commande' : 'Order reference') . '</td>
+                        <td style="padding:8px 16px;font-size:14px;font-weight:600;color:#1e293b;text-align:right;">#' . str_pad($orderId, 6, '0', STR_PAD_LEFT) . '</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:8px 16px;font-size:14px;color:#64748b;">' . ($lang == 'fr' ? 'Style' : 'Style') . '</td>
+                        <td style="padding:8px 16px;font-size:14px;font-weight:600;color:#1e293b;text-align:right;">' . ucfirst($cartStyle) . '</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:8px 16px;font-size:14px;color:#64748b;">' . ($lang == 'fr' ? 'Nombre de pièces' : 'Brick count') . '</td>
+                        <td style="padding:8px 16px;font-size:14px;font-weight:600;color:#1e293b;text-align:right;">' . $proposal['total_bricks_count'] . '</td>
+                    </tr>
+                    <tr style="border-top:1px solid #e2e8f0;">
+                        <td style="padding:12px 16px;font-size:16px;font-weight:700;color:#1e293b;">Total</td>
+                        <td style="padding:12px 16px;font-size:16px;font-weight:700;color:#3b82f6;text-align:right;">' . number_format($cartPrice, 2) . ' €</td>
+                    </tr>
+                </table>
+
+                <div style="background:#dcfce7;border:1px solid #bbf7d0;border-radius:8px;padding:14px 16px;">
+                    <p style="margin:0;color:#166534;font-size:13px;">
+                        ' . ($lang == 'fr' ? 'Votre kit est en cours de préparation. Vous recevrez un email dès l\'expédition.' : 'Your kit is being prepared. You will receive an email once shipped.') . '
+                    </p>
+                </div>
+            </td></tr>
+            <tr><td style="background:#f8fafc;padding:20px 40px;border-radius:0 0 16px 16px;border-top:1px solid #e2e8f0;text-align:center;">
+                <p style="margin:0;color:#94a3b8;font-size:12px;">© ' . date('Y') . ' img2brick — ' . ($lang == 'fr' ? 'Tous droits réservés' : 'All rights reserved') . '</p>
+            </td></tr>
+        </table>
+        </td></tr></table>
+        </body></html>';
+
+        $emailSubject = ($lang == 'fr') ? 'Confirmation de votre commande #' . str_pad($orderId, 6, '0', STR_PAD_LEFT) : 'Order confirmation #' . str_pad($orderId, 6, '0', STR_PAD_LEFT);
+        $userMgr->sendEmail($userEmail, $emailSubject, $emailBody);
         exit;
 
     } catch (Exception $e) {
@@ -417,30 +459,29 @@ include "header.php";
         <form method="POST">
             <div class="section-box">
                 <h2><?= msg('section_account') ?></h2>
+
                 <?php if ($isLogged): ?>
-                    <div style="background:#dcfce7; padding:10px; border-radius:6px; color:#166534;">
+                    <div style="background:#dcfce7; padding:12px 14px; border-radius:8px; color:#166534; font-size:14px; display:flex; align-items:center; gap:8px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
                         <?= msg('status_connected') ?>
                     </div>
-                    <div class="cf-turnstile" data-sitekey="<?= htmlspecialchars($_ENV['TURNSTILE_SITEKEY'] ?? '') ?>" data-callback="unlockButton" ></div>
-                <?php else: ?>
-                    <label style="background:#eff6ff; padding:10px; border-radius:6px; margin-bottom:15px; display:block; cursor:pointer;">
-                        <input type="checkbox" name="has_account" value="1" onchange="toggleAuth(this)"> <?= msg('lbl_have_account') ?>
-                    </label>
-                    <div class="cf-turnstile" data-sitekey="<?= htmlspecialchars($_ENV['TURNSTILE_SITEKEY'] ?? '') ?>" data-callback="unlockButton" ></div>
-
-                    <div id="register-fields">
-                        <div class="form-group"><label><?= msg('lbl_email') ?></label><input type="email" name="email"></div>
-                        <div class="form-group"><label><?= msg('lbl_password') ?></label><input type="password" name="password"></div>
-                        <div class="divider"><?= msg('separator_or') ?></div>
-                        <p style="text-align:center; font-size:0.9rem; color:#64748b; margin-bottom:10px;">
-                            <?= msg('prompt_register_full') ?>
-                        </p>
-                        <a href="inscription.php" class="btn-register-alt"><?= msg('btn_register_full') ?></a>
+                    <div class="cf-turnstile" style="margin-top:16px;"
+                        data-sitekey="<?= htmlspecialchars($_ENV['TURNSTILE_SITEKEY'] ?? '') ?>"
+                        data-callback="unlockButton">
                     </div>
+                    <p style="font-size:12px; color:#94a3b8; margin-top:8px;"><?= msg('captcha_unlock_hint') ?></p>
 
-                    <div id="login-fields" class="hidden">
-                        <div class="form-group"><label><?= msg('lbl_email') ?></label><input type="email" name="login_email"></div>
-                        <div class="form-group"><label><?= msg('lbl_password') ?></label><input type="password" name="login_password"></div>
+                <?php else: ?>
+                    <div style="background:#eff6ff; padding:20px; border-radius:10px; text-align:center;">
+                        <p style="margin:0 0 14px; color:#1e293b; font-size:15px; font-weight:500;">
+                            <?= msg('checkout_login_required') ?>
+                        </p>
+                        <a href="inscription.php?redirect=checkout.php"
+                        style="display:inline-block; background:#3b82f6; color:white; padding:11px 28px; border-radius:8px; text-decoration:none; font-size:14px; font-weight:600; transition:background 0.2s;"
+                        onmouseover="this.style.background='#2563eb'"
+                        onmouseout="this.style.background='#3b82f6'">
+                            <?= msg('btn_login_or_register') ?>
+                        </a>
                     </div>
                 <?php endif; ?>
             </div>
@@ -449,26 +490,36 @@ include "header.php";
                 <h2><?= msg('section_shipping') ?></h2>
                 <div class="form-group">
                     <label><?= msg('lbl_address_secure') ?></label>
-                    <input type="text" name="address" placeholder="10 rue de la Mosaïque" required>
+                    <input type="text" name="address" 
+                        value="<?= htmlspecialchars($userData['address'] ?? '') ?>" 
+                        placeholder="10 rue de la Mosaïque" required>
                 </div>
 
                 <div class="form-row">
                     <div>
                         <label><?= msg('lbl_zipcode') ?></label>
-                        <input type="text" name="zipcode" placeholder="75000" required>
+                        <input type="text" name="zipcode" 
+                            value="<?= htmlspecialchars($userData['zipcode'] ?? '') ?>" 
+                            placeholder="75000" required>
                     </div>
                     <div>
                         <label><?= msg('lbl_city') ?></label>
-                        <input type="text" name="city" required>
+                        <input type="text" name="city" 
+                            value="<?= htmlspecialchars($userData['city'] ?? '') ?>" 
+                            required>
                     </div>
                 </div>
                 <div class="form-group">
                     <label><?= msg('lbl_country') ?></label>
-                    <input type="text" name="country" value="France" required>
+                    <input type="text" name="country" 
+                        value="<?= htmlspecialchars($userData['country'] ?? 'France') ?>" 
+                        required>
                 </div>
                 <div class="form-group">
                     <label><?= msg('lbl_phone_secure') ?></label>
-                    <input type="tel" name="phone" placeholder="06..." required>
+                    <input type="tel" name="phone" 
+                        value="<?= htmlspecialchars($userData['phone'] ?? '') ?>" 
+                        placeholder="06..." required>                
                 </div>
             </div>
 
@@ -543,24 +594,8 @@ include "header.php";
 </script>
 
 <script>
-    function toggleAuth(cb) {
-        const reg = document.getElementById('register-fields');
-        const log = document.getElementById('login-fields');
-        if (cb.checked) {
-            reg.classList.add('hidden');
-            log.classList.remove('hidden');
-            // Remove the required from the hidden fields to avoid blocking the form
-            reg.querySelectorAll('input').forEach(i => i.required = false);
-            log.querySelectorAll('input').forEach(i => i.required = true);
-        } else {
-            reg.classList.remove('hidden');
-            log.classList.add('hidden');
-            reg.querySelectorAll('input').forEach(i => i.required = true);
-            log.querySelectorAll('input').forEach(i => i.required = false);
-        }
-    }
-    function unlockButton() {
-        document.getElementById('paypal-button-container').style.display = 'block';
-    }
+function unlockButton() {
+    document.getElementById('paypal-button-container').style.display = 'block';
+}
 </script>
 

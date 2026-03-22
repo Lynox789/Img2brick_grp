@@ -149,7 +149,7 @@
 
     <div class="footer-bottom">
         <div class="footer-container" style="display:block;">
-            &copy; <?= date('Y') ?> <?= msg('footer_copyright') ?>
+            <?= date('Y') ?> <?= msg('footer_copyright') ?>
         </div>
     </div>
 </footer>

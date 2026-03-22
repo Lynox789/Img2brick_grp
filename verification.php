@@ -33,12 +33,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         unset($_SESSION['pending_user_id']);
         unset($_SESSION['auth_mode']);
 
-        if (isset($_SESSION['redirect_after_auth']) && $_SESSION['redirect_after_auth'] === 'cart.php') {
-            header("Location: cart.php");
-            exit;
-        }
-        header("Location: index.php"); 
+        $redirect = $_SESSION['redirect_after_auth'] ?? 'index.php';
+        unset($_SESSION['redirect_after_auth']);
+        header("Location: " . $redirect);
         exit;
+        
     } else {
         $message = msg('verif_error_code');
     }
