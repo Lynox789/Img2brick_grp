@@ -22,8 +22,7 @@ if (session_status() === PHP_SESSION_NONE) {
         * { box-sizing: border-box; }
 
         html, body {
-            height: 100%;
-            margin: 0;
+
         }
 
         body {

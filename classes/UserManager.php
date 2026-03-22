@@ -204,8 +204,92 @@ class UserManager {
         $link = "http://localhost/Img2brick_grp/reset_password.php?token=" . $token;
 
         $subject = "Réinitialisation de votre mot de passe";
-        $body = "Cliquez sur ce lien pour réinitialiser votre mot de passe (valide 1 min) : <br><br> <a href='$link'>$link</a>";
+        $body = '
+        <!DOCTYPE html>
+        <html lang="fr">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="margin:0; padding:0; background-color:#f1f5f9; font-family: Poppins, Arial, sans-serif;">
 
+            <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f1f5f9; padding: 40px 20px;">
+                <tr>
+                    <td align="center">
+                        <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%;">
+                            
+                            <!-- Header -->
+                            <tr>
+                                <td align="center" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); padding: 40px 30px; border-radius: 16px 16px 0 0;">
+                                    <h1 style="margin:0; color:white; font-size:28px; font-weight:800; letter-spacing:-0.5px;">
+                                        Img2brick
+                                    </h1>
+                                    <p style="margin:8px 0 0; color:rgba(255,255,255,0.8); font-size:14px;">
+                                        Transformez vos images en mosaïques
+                                    </p>
+                                </td>
+                            </tr>
+
+                            <!-- Body -->
+                            <tr>
+                                <td style="background:white; padding: 40px 40px 30px;">
+                                    
+                                    <h2 style="margin:0 0 12px; color:#1e293b; font-size:22px; font-weight:700;">
+                                        Réinitialisation de mot de passe
+                                    </h2>
+                                    <p style="margin:0 0 24px; color:#64748b; font-size:15px; line-height:1.6;">
+                                        Vous avez demandé à réinitialiser votre mot de passe. Cliquez sur le bouton ci-dessous pour en choisir un nouveau.
+                                    </p>
+
+                                    <!-- Button -->
+                                    <table width="100%" cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <td align="center" style="padding: 10px 0 30px;">
+                                                <a href="' . $link . '" 
+                                                style="display:inline-block; background:#3b82f6; color:white; text-decoration:none; padding:14px 36px; border-radius:8px; font-size:15px; font-weight:600;">
+                                                    Réinitialiser mon mot de passe
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    <!-- Warning box -->
+                                    <table width="100%" cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <td style="background:#fef9c3; border:1px solid #fde68a; border-radius:8px; padding:14px 16px;">
+                                                <p style="margin:0; color:#92400e; font-size:13px; line-height:1.5;">
+                                                    ATTENTION : Ce lien est valable <strong>1 minute</strong> seulement. Si vous n\'avez pas fait cette demande, ignorez cet email.
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    <!-- Fallback link -->
+                                    <p style="margin:24px 0 0; color:#94a3b8; font-size:12px; line-height:1.6;">
+                                        Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :<br>
+                                        <a href="' . $link . '" style="color:#3b82f6; word-break:break-all;">' . $link . '</a>
+                                    </p>
+
+                                </td>
+                            </tr>
+
+                            <!-- Footer -->
+                            <tr>
+                                <td style="background:#f8fafc; padding:20px 40px; border-radius:0 0 16px 16px; border-top:1px solid #e2e8f0;">
+                                    <p style="margin:0; color:#94a3b8; font-size:12px; text-align:center; line-height:1.6;">
+                                        © ' . date('Y') . ' img2brick — Tous droits réservés<br>
+                                        Cet email a été envoyé automatiquement, merci de ne pas y répondre.
+                                    </p>
+                                </td>
+                            </tr>
+
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+        </body>
+        </html>';
         return $this->sendEmail($email, $subject, $body);
     }
 
