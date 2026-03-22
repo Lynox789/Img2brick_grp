@@ -170,12 +170,12 @@ include "header.php";
                             </div>
 
                             <div class="detail-group" style="margin-bottom:0;">
-                                <a href="generate_facture.php?order_id=<?= $order['id'] ?>" class="btn-new-order" style="display:block; text-align:center;">
+                                <a href="generate_facture.php?order_id=<?= $order['id'] ?>&lang=<?= $lang ?>" class="btn-new-order" style="display:block; text-align:center;">
                                     <?= msg('btn_download_invoice') ?>
                                 </a>
                             </div>
                             <div class="detail-group" style="margin-bottom:0; margin-top:10px;">
-                                <a href="generate_manuel.php?order_id=<?= $order['id'] ?>" class="btn-new-order" style="display:block; text-align:center;">
+                                <a href="generate_manuel.php?order_id=<?= $order['id'] ?>&lang=<?= $lang ?>" class="btn-new-order" style="display:block; text-align:center;">
                                     <?= msg('btn_download_manual') ?>
                                 </a>
                             </div>
