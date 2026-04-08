@@ -1,5 +1,17 @@
 <?php
 require "config.php";
+require_once "classes/LoyaltyManager.php"; // Ajout du manager
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Récupération ou création du loyaltyId
+$loyaltyId = "guest"; // Par défaut, un visiteur non connecté
+if (isset($_SESSION['user_id'])) {
+    $loyalty = new LoyaltyManager($db, 'http://localhost:3001/api');
+    $loyaltyId = $loyalty->getLoyaltyId($_SESSION['user_id']);
+}
 
 // Configuration for file constraints
 $uploadedFile = null;
@@ -457,7 +469,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
         <button id="submitBtn" type="submit"><?= msg('btn_continue') ?></button>
     </form>
     <div style="text-align:center; margin-top:100px;">
-        <a href="jeux.php" style="
+        <a href="http://localhost:5173/?loyaltyId=<?= urlencode($loyaltyId) ?>" target="_blank" style="
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -474,9 +486,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
         "
         onmouseover="this.style.borderColor='#3b82f6'; this.style.color='#3b82f6'; this.style.background='#eff6ff';"
         onmouseout="this.style.borderColor='#cbd5e1'; this.style.color='#475569'; this.style.background='white';">
-            <?= msg('btn_play_game') ?>
+            🎯 <?= msg('btn_play_game') ?>
         </a>
-    </div>    
+    </div>  
 </section>
 </div>
 
