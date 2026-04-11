@@ -140,7 +140,18 @@ if (isset($_POST['login'])) {
         
         // Verify if user data returned is a valid array and not empty
         if (is_array($userData) && !empty($userData)) {
-            
+            // TOTP VERIFICATION
+            if (isset($userData['2fa_method']) && $userData['2fa_method'] === 'totp') {
+                // The TOTP is activated for this user, we bypass the email
+                $_SESSION['auth_mode'] = 'LOGIN';
+                $_SESSION['pending_user_id'] = $userData['id'];
+                
+                // Redirection to the new Authenticator code entry page
+                header("Location: login_totp.php");
+                exit;
+            }
+
+            // The TOTP is not activated, we send the email
             // Generate 2FA Token using the ID from the user array
             $verificationCode = $tokenMgr->generate2FACode($userData['id']);
             

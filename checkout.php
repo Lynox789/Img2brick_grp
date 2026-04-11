@@ -272,7 +272,7 @@ include "header.php";
 
             <?php if ($isLogged && $balanceInfo['points'] > 0): ?>
                 <div style="background:#fff; padding:15px; border-radius:8px; margin:15px 0; border:1px solid #e2e8f0;">
-                    <h4 style="margin:0 0 10px; color:#2563eb; font-size:15px;">🎁 Vos points de fidélité</h4>
+                    <h4 style="margin:0 0 10px; color:#2563eb; font-size:15px;">Vos points de fidélité</h4>
                     <p style="font-size:13px; color:#64748b; margin-bottom:10px;">
                         Vous possédez <strong><?= $balanceInfo['points'] ?> pts</strong> (<?= $balanceInfo['euros'] ?> €).
                     </p>

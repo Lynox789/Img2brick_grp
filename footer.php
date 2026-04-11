@@ -120,7 +120,7 @@
                 <li><a href="index.php"><?= msg('nav_create_mosaic') ?></a></li>
                 <?php if(isset($_SESSION['user_id'])): ?>
                     <li><a href="panier.php"><?= msg('nav_my_orders') ?></a></li>
-                    <li><a href="logout.php"><?= msg('nav_logout') ?></a></li>
+                    <li><a href="deconnexion.php"><?= msg('nav_logout') ?></a></li>
                 <?php else: ?>
                     <li><a href="inscription.php"><?= msg('nav_login_signup') ?></a></li>
                 <?php endif; ?>

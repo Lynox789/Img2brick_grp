@@ -1,6 +1,11 @@
 <?php
 require "config.php";
 require_once "classes/Security.php"; 
+require_once "vendor/autoload.php";
+require_once "classes/TwoFactorAuthLight.php"; 
+use chillerlan\QRCode\QRCode;
+use chillerlan\QRCode\QROptions;
+use chillerlan\QRCode\Common\EccLevel; 
 
 // Session check
 if (session_status() === PHP_SESSION_NONE) session_start();
@@ -17,6 +22,34 @@ $msgType = "";
 $lang = $_SESSION['lang'] ?? 'en'; 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // SECURE DISABLING OF TOTP 
+    if (isset($_POST['disable_totp'])) {
+        try {
+            $passwordSaisi = $_POST['password_confirm'] ?? '';
+            
+            // We retrieve the user’s real hashed password
+            $stmtPwd = $db->prepare("SELECT password FROM users WHERE id = ?");
+            $stmtPwd->execute([$userId]);
+            $hash = $stmtPwd->fetchColumn();
+
+            // We verify if what they entered matches
+            if (password_verify($passwordSaisi, $hash)) {
+                // This is the correct user. We deactivate the Authenticator.
+                $stmt = $db->prepare("UPDATE users SET totp_secret = NULL, backup_codes = NULL, 2fa_method = 'email' WHERE id = ?");
+                $stmt->execute([$userId]);
+
+                $message = ($lang == 'fr') ? "L'authenticator a été désactivé avec succès." : "Authenticator successfully disabled.";
+                $msgType = "success";
+            } else {
+                // Wrong password: spoofing attempt blocked
+                $message = ($lang == 'fr') ? "Mot de passe incorrect. Impossible de désactiver la sécurité." : "Incorrect password. Cannot disable security.";
+                $msgType = "error";
+            }
+        } catch (Exception $e) {
+            $message = (($lang == 'fr') ? "Erreur : " : "Error: ") . $e->getMessage();
+            $msgType = "error";
+        }
+    }
     
     // Identity update
     if (isset($_POST['update_identity'])) {
@@ -166,12 +199,32 @@ $displayZip     = $user['zipcode'] ?? '';
 $displayCity    = $user['city'] ?? '';
 $displayCountry = $user['country'] ?? '';
 
+// TOTP LOGIC 
+$isTotpActive = isset($user['2fa_method']) && $user['2fa_method'] === 'totp';
+$qrCodeImageBase64 = '';
+$secret = '';
+
+if (!$isTotpActive) {
+    $tfa = new TwoFactorAuthLight();
+    if (empty($_SESSION['temp_totp_secret'])) {
+        $_SESSION['temp_totp_secret'] = $tfa->createSecret();
+    }
+    $secret = $_SESSION['temp_totp_secret'];
+    
+    // Generation of the QR Code
+    $uri = $tfa->getQRCodeUrl('Img2Brick', $displayEmail, $secret);
+    $options = new QROptions([
+        'version'      => 5,
+        'eccLevel'     => EccLevel::L,
+    ]);
+    $qrcode = new QRCode($options);
+    $qrCodeImageBase64 = $qrcode->render($uri);
+}
 
 include "header.php";
 ?>
 
 <style>
-    /* ... (Keep your existing CSS) ... */
     :root { --bg-color: #f8fafc; --card-bg: #ffffff; --primary: #2563eb; --text-main: #1e293b; --border: #e2e8f0; }
     body { background-color: var(--bg-color); color: var(--text-main); }
     .account-container { max-width: 1000px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: 250px 1fr; gap: 40px; }
@@ -201,7 +254,7 @@ include "header.php";
     <div class="sidebar-menu">
         <a href="account.php" class="menu-item active"> <?= ($lang == 'fr') ? "Mon Profil" : "My Profile" ?></a>
         <a href="panier.php" class="menu-item"> <?= ($lang == 'fr') ? "Mes Commandes" : "My Orders" ?></a>
-        <a href="logout.php" class="menu-item" style="color:#ef4444;"> <?= ($lang == 'fr') ? "Déconnexion" : "Logout" ?></a>
+        <a href="deconnexion.php" class="menu-item" style="color:#ef4444;"> <?= ($lang == 'fr') ? "Déconnexion" : "Logout" ?></a>
     </div>
 
     <div class="content-area">
@@ -267,11 +320,60 @@ include "header.php";
 
         <div class="card">
             <h2><?= ($lang == 'fr') ? "Sécurité" : "Security" ?></h2>
-            <p style="margin-bottom: 10px;">
+            <p style="margin-bottom: 20px;">
                 <a href="forgot_password.php" style="color: var(--primary); text-decoration: none; font-weight: bold;">
                     <?= ($lang == 'fr') ? "Changer mon mot de passe" : "Change my password" ?>
                 </a>
             </p>
+
+            <h3 style="margin-top: 30px; font-size: 1.1rem; border-top: 1px solid var(--border); padding-top: 15px;">Double Authentification</h3>
+            
+            <?php if ($isTotpActive): ?>
+                    <div class="alert alert-success" style="margin-bottom: 20px;">
+                        <strong> <?= ($lang == 'fr') ? "Activé" : "Enabled" ?></strong> : <?= ($lang == 'fr') ? "Votre compte est sécurisé par l'application Google Authenticator." : "Your account is secured by Google Authenticator." ?>
+                    </div>
+                    
+                    <div style="background: #fee2e2; border: 1px solid #fecaca; border-radius: 8px; padding: 20px;">
+                        <h4 style="margin-top: 0; color: #991b1b; font-size: 1rem;">
+                            <?= ($lang == 'fr') ? "Désactiver l'Authenticator" : "Disable Authenticator" ?>
+                        </h4>
+                        <p style="font-size: 0.9rem; color: #7f1d1d; margin-bottom: 15px;">
+                            <?= ($lang == 'fr') ? "Pour confirmer la désactivation, veuillez saisir votre mot de passe actuel." : "To confirm deactivation, please enter your current password." ?>
+                        </p>
+                        
+                        <form method="POST" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <input type="password" name="password_confirm" required placeholder="<?= ($lang == 'fr') ? 'Votre mot de passe' : 'Your password' ?>" style="padding: 10px; border: 1px solid #f87171; border-radius: 6px; flex: 1; min-width: 200px; max-width: 250px;">
+                            <button type="submit" name="disable_totp" style="background: #ef4444; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s;">
+                                <?= ($lang == 'fr') ? "Désactiver" : "Disable" ?>
+                            </button>
+                        </form>
+                    </div>
+
+                <?php else: ?>
+                <p style="font-size: 0.95rem; color: #475569;">
+                    <?= ($lang == 'fr') ? "Sécurisez votre compte en utilisant une application comme Google Authenticator ou FreeOTP." : "Secure your account using an app like Google Authenticator or FreeOTP." ?>
+                </p>
+                
+                <div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; background: #f8fafc; padding: 20px; border-radius: 8px; margin-top: 15px;">
+                            
+                    <img src="<?= $qrCodeImageBase64 ?>" alt="QR Code" style="border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); max-width: 30%; height: auto;">
+                    
+                    <div style="flex: 1; min-width: 250px;">
+                        <p style="margin:0 0 10px 0; font-weight: bold;">1. <?= ($lang == 'fr') ? "Scannez le QR Code" : "Scan the QR Code" ?></p>
+                        
+                        <p style="margin:0 0 15px 0; font-size: 0.85rem; color: #64748b; word-break: break-all;">
+                            <?= ($lang == 'fr') ? "Clé manuelle :" : "Manual key:" ?> <strong style="color: #1e293b;"><?= htmlspecialchars($secret) ?></strong>
+                        </p>
+                        
+                        <p style="margin:0 0 10px 0; font-weight: bold;">2. <?= ($lang == 'fr') ? "Validez le code" : "Enter the code" ?></p>
+                        
+                        <form action="verify_totp_setup.php" method="POST" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <input type="text" name="totp_code" required pattern="[0-9]{6}" maxlength="6" placeholder="123456" style="padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; width: 120px; text-align: center; letter-spacing: 2px;">
+                            <button type="submit" class="btn-save" style="margin: 0;"><?= ($lang == 'fr') ? "Activer" : "Enable" ?></button>
+                        </form>
+                    </div>
+                </div>
+            <?php endif; ?>
         </div>
 
     </div>

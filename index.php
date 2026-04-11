@@ -486,7 +486,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
         "
         onmouseover="this.style.borderColor='#3b82f6'; this.style.color='#3b82f6'; this.style.background='#eff6ff';"
         onmouseout="this.style.borderColor='#cbd5e1'; this.style.color='#475569'; this.style.background='white';">
-            🎯 <?= msg('btn_play_game') ?>
+             <?= msg('btn_play_game') ?>
         </a>
     </div>  
 </section>
