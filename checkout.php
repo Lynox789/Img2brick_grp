@@ -6,13 +6,22 @@ require_once "classes/LoyaltyManager.php"; // Inclus le manager de fidélité
 if (file_exists("classes/Security.php")) require_once "classes/Security.php";
 if (session_status() === PHP_SESSION_NONE) session_start();
 
+// We detect if it’s a "hidden" request sent by the PayPal button.
+$isAjaxPost = ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['paypal_order_id']));
+
 // CONTROL CHECK
 if (!isset($_SESSION['final_proposal_id'])) {
+    if ($isAjaxPost) {
+        // Instead of redirecting (which breaks the JSON), we return a proper JSON error
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'error' => 'Session expired. Please refresh the page.']);
+        exit;
+    }
     header("Location: index.php");
     exit;
 }
 
-// Initialisation de la fidélité
+// Initialization of loyalty
 $loyalty = new LoyaltyManager($db, 'http://localhost:3001/api');
 $userId = $_SESSION['user_id'] ?? null;
 $propId = $_SESSION['final_proposal_id'];
@@ -24,6 +33,11 @@ $proposal = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$proposal) {
     error_log("Erreur Checkout: Proposition #$propId introuvable en BDD.");
+    if ($isAjaxPost) {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'error' => 'Proposition introuvable.']);
+        exit;
+    }
     header("Location: index.php");
     exit;
 }
@@ -31,7 +45,7 @@ if (!$proposal) {
 $imageId = $proposal['image_id']; 
 $imagePath = "uploads/preview_" . $propId . ".png"; 
 $cartStyle = str_replace('ALGO_', 'Algo ', $proposal['strategy']); 
-$basePrice = $proposal['total_bricks_count'] * 0.10; // Prix de base sans réduction
+$basePrice = $proposal['total_bricks_count'] * 0.10; // Base price without discount
 $error = "";
 $isLogged = isset($_SESSION['user_id']);
 
@@ -69,6 +83,10 @@ if ($isLogged) {
 
 // PROCESSING OF THE FORM
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    ob_clean(); 
+    ini_set('display_errors', 0); 
+    header('Content-Type: application/json');
 
     $paypalOrderId = $_POST['paypal_order_id'] ?? null;
     $paypalStatus  = $_POST['paypal_status'] ?? null;
