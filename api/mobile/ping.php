@@ -1,10 +1,5 @@
 <?php
-/**
- * api/mobile/ping.php
- *
- * Endpoint appelé quotidiennement par l'application Android.
- */
-
+//File called everyday by the android application
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST');
@@ -15,9 +10,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-require_once __DIR__ . '/../../includes/db_connect.php';
+require_once __DIR__ . '/../../connexion/Database.php';
+$pdo = Database::getInstance()->getConnection();
 
-// Seuil de fidélisation : nombre de jours sans activité avant de notifier
+//notification time every week
 define('LOYALTY_THRESHOLD_DAYS', 7);
 
 try {
@@ -32,7 +28,7 @@ try {
         exit;
     }
     
-    //Mettre à jour le last_seen et associer le user_id
+    //Update the last_seen and associate the user_id
     if ($userId) {
         $stmt = $pdo->prepare('
             UPDATE app_installations 
@@ -45,12 +41,12 @@ try {
         $stmt->execute([$deviceId]);
     }
     
-    //Vérifier la fidélisation
+    //Check Loyalty
     $showLoyaltyNotif = false;
     $loyaltyMessage = '';
     
     if ($userId) {
-        // Dernière commande
+        // Last command
         $stmt = $pdo->prepare('SELECT MAX(date_commande) as last_order FROM commandes WHERE user_id = ?');
         $stmt->execute([$userId]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -60,10 +56,10 @@ try {
             $daysSinceOrder = (int)((time() - strtotime($row['last_order'])) / 86400);
         }
         
-        // Si pas de commande depuis le seuil (ou jamais commandé)
+        // If no order since the threshold (or never ordered)
         if ($daysSinceOrder === null || $daysSinceOrder > LOYALTY_THRESHOLD_DAYS) {
             $showLoyaltyNotif = true;
-            
+                
             if ($daysSinceOrder === null) {
                 $loyaltyMessage = "Vous n'avez pas encore passé de commande ! Découvrez nos tableaux Lego et gagnez des points en jouant.";
             } elseif ($daysSinceOrder > 30) {

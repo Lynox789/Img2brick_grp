@@ -1,11 +1,5 @@
 <?php
-/**
- * api/mobile/install.php
- *
- * Endpoint appelé au premier lancement de l'application Android.
- * Enregistre l'installation dans la table app_installations.
- *
- */
+
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -17,8 +11,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-// Connexion à la base de données (adapter selon votre configuration)
+// Connexion to the database
 require_once __DIR__ . '/../../connexion/Database.php';
+$pdo = Database::getInstance()->getConnection();
 
 try {
     $data = json_decode(file_get_contents('php://input'), true);
@@ -31,15 +26,14 @@ try {
     $deviceId = $data['deviceId'];
     $appVersion = $data['appVersion'] ?? '1.0';
     
-    // INSERT ou UPDATE si le device existe déjà
+    // INSERT or UPDATE if the device already exists
     $stmt = $pdo->prepare('
         INSERT INTO app_installations (device_id, app_version, installed_at, last_seen) 
         VALUES (?, ?, NOW(), NOW()) 
         ON DUPLICATE KEY UPDATE last_seen = NOW(), app_version = VALUES(app_version)
     ');
     $stmt->execute([$deviceId, $appVersion]);
-    
-    // Compter le total d'installations pour les stats admin
+
     $countStmt = $pdo->query('SELECT COUNT(*) as total FROM app_installations');
     $total = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
     

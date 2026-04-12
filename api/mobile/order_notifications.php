@@ -1,13 +1,4 @@
 <?php
-/**
- * api/mobile/order_notifications.php
- *
- * Endpoint appelé par l'application Android pour vérifier
- * les notifications de commande en attente.
- *
- * Retourne les commandes récentes dont la notification n'a pas encore été envoyée.
- * Marque les notifications comme envoyées pour éviter les doublons.
- */
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -24,7 +15,7 @@ try {
         exit;
     }
     
-    // Récupérer les commandes récentes (dernières 48h) pas encore notifiées
+    // Retrieve recent orders (last 48 hours) not yet notified
     $stmt = $pdo->prepare("
         SELECT c.id, c.statut, c.total_price, c.date_commande
         FROM commandes c
@@ -49,7 +40,7 @@ try {
         $statut = $cmd['statut'];
         $total = number_format((float)$cmd['total_price'], 2, ',', ' ');
         
-        // Construire le titre selon le statut
+        // Construct the title according to status
         switch ($statut) {
             case 'en_attente':
                 $title = "Commande #{$orderId} en attente de paiement";
@@ -72,7 +63,7 @@ try {
             'date' => $cmd['date_commande'],
         ];
         
-        // Marquer comme envoyée
+        // Mark as sent
         $insertStmt = $pdo->prepare("
             INSERT IGNORE INTO mobile_notifications_sent (user_id, commande_id, notif_type) 
             VALUES (?, ?, ?)

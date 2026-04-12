@@ -5,6 +5,7 @@
 #ignore database connexion file
 
 connexion/Database.php
+images/test/*
 
 #sql files
 *.sql

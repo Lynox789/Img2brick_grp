@@ -4,6 +4,40 @@ require "config.php";
 // Session verification
 if (session_status() === PHP_SESSION_NONE) session_start();
 
+if (isset($_GET['buy_promo'])) {
+    $promoName = $_GET['buy_promo'];
+
+    $promos = [
+        'daily_lego_sunset' => 2109,
+        'daily_lego_dragon' => 3905,
+        'daily_lego_flowers' => 3138,
+        'daily_lego_flower' => 1810,
+        'daily_lego_plane' => 3095,
+        'daily_lego_squirrel' => 5797,
+        'daily_lego_buildings' => 4243
+    ];
+
+    $bricksCount = $promos[$promoName] ?? 10000;
+
+    $stmtImg = $db->prepare("INSERT INTO images (filename, extension, image_blob, target_size) VALUES (?,'png', NULL, 96)");
+    $stmtImg->execute([$promoName . '.png']);
+    $imageId = $db->lastInsertId();
+
+    $stmtProp = $db->prepare("INSERT INTO mosaic_proposals (image_id, strategy, resolution, total_bricks_count, created_at) VALUES (?,'ALGO_3', 'Promo', ?, NOW())");
+    $stmtProp->execute([$imageId, $bricksCount]);
+    $propId = $db->lastInsertId();
+
+    $source = __DIR__ . '/images/promo/' . $promoName . '.png';
+    $dest = __DIR__ . '/uploads/preview_' . $propId . '.png';
+    if (file_exists($source)) {
+        copy($source, $dest);
+    }
+
+    $_SESSION['final_proposal_id'] = $propId;
+    header("Location: cart.php");
+    exit;
+}
+
 if (!isset($_SESSION['final_proposal_id'])) {
     // If we arrive here without going through results.php, return to the upload
     header("Location: index.php");
